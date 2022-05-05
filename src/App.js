@@ -17,7 +17,6 @@ const App = () => {
     const {access, user} = auth;
     setUser(user);
     setIsAuthenticated(!!access)
-    console.log(auth,'--====---')
   }
 
   useEffect(()=>{ 
@@ -25,7 +24,7 @@ const App = () => {
   },[])
 
   return (
-    <BrowserRouter>
+    <BrowserRouter basename={process.env.PUBLIC_URL}>
       <div>
         <Header userData={user}  />
         {isAuthenticated ?
