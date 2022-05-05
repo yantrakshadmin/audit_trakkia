@@ -1,37 +1,30 @@
-import React, { useEffect, useState } from 'react'
-import { Form, Input, Button, Checkbox } from 'antd';
-import { UserOutlined, LockOutlined } from '@ant-design/icons';
-import { Link } from 'react-router-dom';
 import axios from 'axios';
-import { DEFAULT_BASE_URL } from '../enviornment';
-import { ACCESS_TOKEN, REFRESH_TOKEN } from '../storage';
+import * as React from 'react'
+import { Form, Input, Button, notification } from 'antd';
+import { UserOutlined, LockOutlined } from '@ant-design/icons';
+import {reactLocalStorage} from 'reactjs-localstorage';
 
-function Login({ usernames, passwords, getUserDetails, setPassword, setUsername}) {
-    // const [usernames, setUsername] = useState('');
-    // const [passwords, setPassword] = useState('');
+import {getUser} from '../helpers/login'
 
+const Login = ({ onLogin: onLoginProp }) => {
+   
+    const onLogin = async (data) => {
+        console.log(data);
+        // try{
+            const {username, password} = data;
+            const { data: token } = await axios.post(`/api/token/`,{password,username})
+            const { access, refresh } = token;
+            axios.defaults.headers.common['Authorization'] = `Bearer ${access}`
+            const {data:user} = await getUser(access);        
+            reactLocalStorage.set('access', access);
+            reactLocalStorage.set('refresh', refresh);
+            reactLocalStorage.set('user', JSON.stringify(user || {}));
+            onLoginProp(user)
+        // }catch(e){
 
-    useEffect(() => {
-        getUserDetails();
-    }, [])
-    
-
-    const onChangeName = (e) => {
-        setUsername(e.target.value)
-    }
-    const onChangePassword = (e) => {
-        setPassword(e.target.value)
+        // }
         
-    }
-    
-
-    // const handelLogin = async () => {
-    //     const {data:res} = await axios.get('https://tmultibackend.trakkia.com/create-rfidinv/').then((e) => console.log(e, "dattt"))
-    //     console.log(res, "ressssss");
-        
-    // }
-    console.log(usernames, "username");
-    console.log(passwords, "pass");
+      }
 
   return (
       <div className='login-form' >
@@ -39,15 +32,21 @@ function Login({ usernames, passwords, getUserDetails, setPassword, setUsername}
           <Form
               name="normal_login"
               className="login-form"
+              onFinish={(data)=>{onLogin(data)}}
+              onFinishFailed={()=>{
+                  notification.error({
+                    message: 'Error in Login',
+                    description:
+                  'Something went wrong.',
+                })}}
               initialValues={{ remember: true }}
-            //   onFinish={onFinish}
               >
                   <h1>Login</h1>
               <Form.Item
                   name="username"
                   rules={[{ required: true, message: 'Please input your Username!' }]}
               >
-                  <Input prefix={<UserOutlined className="site-form-item-icon" />} placeholder="Username" onChange={onChangeName} />
+                  <Input prefix={<UserOutlined className="site-form-item-icon" />} placeholder="Username"/>
               </Form.Item>
               <Form.Item
                   name="password"
@@ -57,25 +56,18 @@ function Login({ usernames, passwords, getUserDetails, setPassword, setUsername}
                       prefix={<LockOutlined className="site-form-item-icon" />}
                       type="password"
                           placeholder="Password"
-                          onChange={onChangePassword}
                   />
               </Form.Item>
           
 
               <Form.Item>
-                      <Button type="primary"
-                          htmlType="submit"
-                          className="login-form-button"
-                          onClick={getUserDetails}
-                      >
-                          
-                          {/* <Link to="/main"> */}
-                              Log in
-                          {/* </Link> */}
-
-                      </Button>
-
-                
+                <Button 
+                    type="primary"
+                    htmlType="submit"
+                    className="login-form-button"
+                >                      
+                        Log in
+                </Button>
               </Form.Item>
               </Form>
           </div>

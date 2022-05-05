@@ -61,14 +61,6 @@
   margin: 2rem 0 0 0 ;
 }
 
-
-
-
-
-
-
-
-
 .select{
   border: 1px solid black;
   width: 5rem;
@@ -87,4 +79,8 @@
 }
 .align-c {
   align-items: center;
+}
+
+.active {
+  background-color: #b3e5fc;
 }
