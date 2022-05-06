@@ -49,6 +49,10 @@
   border-radius: 8px;
 
 }
+
+.serials-title{
+  margin: 0;
+word-wrap: break-word;}
 .dropdown{
   display: flex;
   justify-content: center;
