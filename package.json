@@ -2,7 +2,7 @@
   "name": "audit-trakkia",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://yantrakshadmin.github.io",
+  "homepage": "https://yantrakshadmin.github.io/audit_trakkia",
   "dependencies": {
     "@testing-library/jest-dom": "^5.16.4",
     "@testing-library/react": "^13.1.1",
