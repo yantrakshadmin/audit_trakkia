@@ -1,16 +1,16 @@
 {
   "files": {
     "main.css": "/audit_trakkia/static/css/main.718719db.css",
-    "main.js": "/audit_trakkia/static/js/main.6284060e.js",
+    "main.js": "/audit_trakkia/static/js/main.5d750b22.js",
     "static/js/787.60d06b8e.chunk.js": "/audit_trakkia/static/js/787.60d06b8e.chunk.js",
     "static/media/Logo.png": "/audit_trakkia/static/media/Logo.706875690f961bb7ac39.png",
     "index.html": "/audit_trakkia/index.html",
     "main.718719db.css.map": "/audit_trakkia/static/css/main.718719db.css.map",
-    "main.6284060e.js.map": "/audit_trakkia/static/js/main.6284060e.js.map",
+    "main.5d750b22.js.map": "/audit_trakkia/static/js/main.5d750b22.js.map",
     "787.60d06b8e.chunk.js.map": "/audit_trakkia/static/js/787.60d06b8e.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.718719db.css",
-    "static/js/main.6284060e.js"
+    "static/js/main.5d750b22.js"
   ]
 }
