@@ -1,16 +1,16 @@
 {
   "files": {
-    "main.css": "/audit_trakkia/static/css/main.718719db.css",
-    "main.js": "/audit_trakkia/static/js/main.4731c8bf.js",
-    "static/js/787.60d06b8e.chunk.js": "/audit_trakkia/static/js/787.60d06b8e.chunk.js",
-    "static/media/Logo.png": "/audit_trakkia/static/media/Logo.706875690f961bb7ac39.png",
-    "index.html": "/audit_trakkia/index.html",
-    "main.718719db.css.map": "/audit_trakkia/static/css/main.718719db.css.map",
-    "main.4731c8bf.js.map": "/audit_trakkia/static/js/main.4731c8bf.js.map",
-    "787.60d06b8e.chunk.js.map": "/audit_trakkia/static/js/787.60d06b8e.chunk.js.map"
+    "main.css": "/static/css/main.718719db.css",
+    "main.js": "/static/js/main.77c43f48.js",
+    "static/js/787.60d06b8e.chunk.js": "/static/js/787.60d06b8e.chunk.js",
+    "static/media/Logo.png": "/static/media/Logo.706875690f961bb7ac39.png",
+    "index.html": "/index.html",
+    "main.718719db.css.map": "/static/css/main.718719db.css.map",
+    "main.77c43f48.js.map": "/static/js/main.77c43f48.js.map",
+    "787.60d06b8e.chunk.js.map": "/static/js/787.60d06b8e.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.718719db.css",
-    "static/js/main.4731c8bf.js"
+    "static/js/main.77c43f48.js"
   ]
 }
