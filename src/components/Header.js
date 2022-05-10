@@ -27,7 +27,7 @@ function Header({ userData }) {
     <div className='header bg-white'>
       <img src={Logo} alt='logo' />
       <div className='header-right'>
-        <h4 className='username'>{userData?.username}</h4>
+        <h3 className='username'>{userData?.username}</h3>
 
         {isAccess ?  <Button onClick={logout}>Log out</Button> :  <p></p> }
 

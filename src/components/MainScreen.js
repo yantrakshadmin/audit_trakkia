@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
-import { List, Divider, Button, Row, Col, Empty, Card, Form, Select, Input } from 'antd';
+import { List, Divider, Button, Row, Col, Empty, Card, Form, Select, Input, notification, message } from 'antd';
+import VirtualList from 'rc-virtual-list';
 import axios from 'axios';
 
 const { Option } = Select;
@@ -29,7 +30,11 @@ const MainScreen = ({ userData }) => {
 
     const [form] = Form.useForm();
 
-    console.log(currentSerialText, "jjjjj");
+    console.log(serials?.serial, "+++++++++");
+    // console.log(currentSerialText, "------------");
+
+
+
 
 
     const forceRerender = () => {
@@ -43,9 +48,14 @@ const MainScreen = ({ userData }) => {
         setStatus(statusValues.stop);
         setSelectedSerialKey(null);
         setForceRerenderKey(Math.random());
-        form.setFieldsValue({ rfId: '', warehouse: null})
+        form.setFieldsValue({ rfId: '', warehouse: null })
 
     }
+
+     const removeDuplicateItems = (arr, key) => {
+        const newArr = new Map(arr.map((item) => [item[key], item])).values();
+        return [...newArr];
+    };
 
     const handleWarehouseChange = (e) => {
         const index = (warehouses || []).findIndex((item) => item.id === e);
@@ -60,10 +70,15 @@ const MainScreen = ({ userData }) => {
         handelWarehouse();
         if (clearText > 0) {
             form.setFieldsValue({ rfId: '' })
-        
             setCurrentSerialText('')
         }
 
+        if (currentSerialTextRef.current ==  serials) {
+            console.log("serial exist");
+        }
+        else {
+            console.log("serial not exist");
+        }
 
     }, [clearText])
 
@@ -71,14 +86,19 @@ const MainScreen = ({ userData }) => {
         console.log(selectedWarehouse, '00000')
     }, [selectedWarehouse])
 
+    const findSerial = serials.some(val => val.serial !== currentSerialText)
+    // console.log(findSerial, "finddddddddddd");
+
 
     const onAddSerial = (e) => {
 
-        if (selectedSerialKeyRef.current !== null) {
+        if (selectedSerialKeyRef.current !== null && findSerial) {
+            removeDuplicateItems(serials, selectedSerialKey);
             setClearText(prev => prev + 1);
 
             setSerials(serials.map(item => {
-                if (item.$key === selectedSerialKeyRef.current) {
+             
+                if (item.$key === selectedSerialKeyRef.current && findSerial) {
                     return {
                         ...item,
                         serial: currentSerialTextRef.current,
@@ -91,19 +111,28 @@ const MainScreen = ({ userData }) => {
                 }
             }))
             setSelectedSerialKey(null);
-          
+
 
 
         } else {
-            setClearText(prev => prev + 1);
 
-            setSerials(prev => ([...prev, { serial: currentSerialTextRef.current, $key: Math.random() }]))
+        
+            setClearText(prev => prev + 1);
+            // setSerials(prev => ([...prev, { serial: currentSerialTextRef.current, $key: Math.random() }]))
+            setSerials((prev) => (removeDuplicateItems([...prev, { serial: currentSerialTextRef.current, $key: Math.random() }], 'serial')))
 
         }
+
+
+
         forceRerender()
+        removeDuplicateItems(serials, selectedSerialKey);
         // setCurrentSerialText('');
 
     }
+    // console.log(selectedSerialKeyRef, "=====================");
+    // console.log(currentSerialTextRef.current, "curreenntttttttttttttt");
+
 
     const deleteItem = (key) => {
         setSerials((prev) => (prev.filter(item => item.$key !== key)));
@@ -113,21 +142,29 @@ const MainScreen = ({ userData }) => {
     }
 
     const onSubmit = async () => {
-    
+
+
 
         axios.post(`/create-rfidinv/`,
             {
                 warehouse: selectedWarehouse?.id,
                 serials,
             })
-            .then(() => {
+            .then((e) => {
                 reset();
+                message.success("Scan success")
             })
             .catch((e) => {
-                console.log(e);
+                // console.log(e);
+                message.warn("something went wrong")
+
             })
         // setCurrentSerialText('')
+        //    openNotification('top')
+
+
     }
+
 
     const handelWarehouse = async () => {
         axios.get(`/company-warehouse/?id=${userData.user_id}`,
@@ -137,18 +174,18 @@ const MainScreen = ({ userData }) => {
 
     }
 
-    const handleKeyPress = (e) => {
-        console.log(e.code, 'this/.....')
-        if (e.code === 'Enter' && currentSerialTextRef.current) {
-            onAddSerial()
-            // setCurrentSerialText('')
-        }
-    };
+    // const handleKeyPress = (e) => {
+    //     console.log(e.code, 'this/.....')
+    //     if (e.code === 'Enter' && currentSerialTextRef.current) {
+    //         onAddSerial()
+    //         // setCurrentSerialText('')
+    //     }
+    // };
 
-    React.useEffect(() => {
-        document.addEventListener('keyup', handleKeyPress);
-        return () => document.removeEventListener('keyup', handleKeyPress);
-    }, []);
+    // React.useEffect(() => {
+    //     document.addEventListener('keyup', handleKeyPress);
+    //     return () => document.removeEventListener('keyup', handleKeyPress);
+    // }, []);
 
     return (
         <div className='site-card-border-less-wrapper'>
@@ -192,32 +229,38 @@ const MainScreen = ({ userData }) => {
                                     <div key={String($forceRerenderKey)}>
                                         <Divider orientation="left">Serials</Divider>
                                         {
-                                            <List
-                                                size="small"
-                                                itemLayout="horizontal"
-                                                dataSource={serials}
-                                                renderItem={(item) => (
-                                                    <List.Item
-                                                        actions={[
-                                                            <EditOutlined
-                                                                disabled={status !== status.start}
-                                                                onClick={() => {
-                                                                    setSelectedSerialKey(item.$key);
-                                                                    setCurrentSerialText(item.serial)
-                                                                }}
 
-                                                            />,
-                                                            <DeleteOutlined
-                                                                disabled={status !== status.start}
-                                                                onClick={() => { deleteItem(item.$key) }}
+                                            <div className='scroll-view'>
+                                                <List
+                                                    size="small"
+                                                    itemLayout="horizontal"
+                                                    dataSource={serials}
+
+                                                    renderItem={(item) => (
+                                                        <List.Item
+                                                            actions={[
+                                                                <EditOutlined
+                                                                    disabled={status !== status.start}
+                                                                    onClick={() => {
+                                                                        setSelectedSerialKey(item.$key);
+                                                                        setCurrentSerialText(item.serial)
+                                                                    }}
+
+                                                                />,
+                                                                <DeleteOutlined
+                                                                    disabled={status !== status.start}
+                                                                    onClick={() => { deleteItem(item.$key) }}
+                                                                />
+                                                            ]}
+                                                            className={selectedSerialKey === item.$key ? 'active' : ''}>
+                                                            <List.Item.Meta
+                                                                title={<p className='serials-title'> {item.serial}</p>}
                                                             />
-                                                        ]}
-                                                        className={selectedSerialKey === item.$key ? 'active' : ''}>
-                                                        <List.Item.Meta
-                                                            title={<p className='serials-title'> {item.serial}</p>}
-                                                        />
-                                                    </List.Item>
-                                                )} />
+
+                                                        </List.Item>
+                                                    )} />
+                                            </div>
+
                                         }
                                     </div> :
                                     <Empty

@@ -11,6 +11,12 @@
 }
 .header-right{
   padding: 0 1rem;
+  display: flex;
+  margin: 1rem 0;
+
+}
+.username {
+  padding-right: 1rem;
 }
 
 /* LOGIN */
@@ -48,6 +54,11 @@
   margin: 3rem 0 0 0;
   border-radius: 8px;
 
+}
+
+.scroll-view{
+  overflow-y: scroll;
+  max-height: 200px;
 }
 
 .serials-title{
