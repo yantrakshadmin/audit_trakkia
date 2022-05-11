@@ -167,7 +167,7 @@ const MainScreen = ({ userData }) => {
 
 
     const handelWarehouse = async () => {
-        axios.get(`/company-warehouse/?id=${userData.user_id}`,
+        axios.get(`/company-warehouse/?id=${userData.company_id}`,
         )
             .then((e) => setWarehouses(e.data))
             .catch((e) => { })
