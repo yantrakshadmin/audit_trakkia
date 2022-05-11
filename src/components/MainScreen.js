@@ -227,7 +227,8 @@ const MainScreen = ({ userData }) => {
                             {
                                 (serials.length) ?
                                     <div key={String($forceRerenderKey)}>
-                                        <Divider orientation="left">Serials</Divider>
+                                        <Divider orientation="left">Serials
+                                        (Count: {serials?.length})</Divider>
                                         {
 
                                             <div className='scroll-view'>
