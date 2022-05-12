@@ -49,7 +49,6 @@ const MainScreen = ({ userData }) => {
         setSelectedSerialKey(null);
         setForceRerenderKey(Math.random());
         form.setFieldsValue({ rfId: '', warehouse: null })
-
     }
 
      const removeDuplicateItems = (arr, key) => {
@@ -91,48 +90,27 @@ const MainScreen = ({ userData }) => {
 
 
     const onAddSerial = (e) => {
-
         if (selectedSerialKeyRef.current !== null && findSerial) {
-            removeDuplicateItems(serials, selectedSerialKey);
             setClearText(prev => prev + 1);
-
             setSerials(serials.map(item => {
-             
                 if (item.$key === selectedSerialKeyRef.current && findSerial) {
                     return {
                         ...item,
                         serial: currentSerialTextRef.current,
                     }
-
                 } else {
-
                     return item
-
                 }
             }))
             setSelectedSerialKey(null);
-
-
-
         } else {
-
-        
             setClearText(prev => prev + 1);
-            // setSerials(prev => ([...prev, { serial: currentSerialTextRef.current, $key: Math.random() }]))
             setSerials((prev) => (removeDuplicateItems([...prev, { serial: currentSerialTextRef.current, $key: Math.random() }], 'serial')))
-
         }
-
-
-
         forceRerender()
-        removeDuplicateItems(serials, selectedSerialKey);
         // setCurrentSerialText('');
-
     }
-    // console.log(selectedSerialKeyRef, "=====================");
-    // console.log(currentSerialTextRef.current, "curreenntttttttttttttt");
-
+   
 
     const deleteItem = (key) => {
         setSerials((prev) => (prev.filter(item => item.$key !== key)));
@@ -142,9 +120,6 @@ const MainScreen = ({ userData }) => {
     }
 
     const onSubmit = async () => {
-
-
-
         axios.post(`/create-rfidinv/`,
             {
                 warehouse: selectedWarehouse?.id,
@@ -157,7 +132,6 @@ const MainScreen = ({ userData }) => {
             .catch((e) => {
                 // console.log(e);
                 message.warn("something went wrong")
-
             })
         // setCurrentSerialText('')
         //    openNotification('top')
@@ -174,18 +148,18 @@ const MainScreen = ({ userData }) => {
 
     }
 
-    // const handleKeyPress = (e) => {
-    //     console.log(e.code, 'this/.....')
-    //     if (e.code === 'Enter' && currentSerialTextRef.current) {
-    //         onAddSerial()
-    //         // setCurrentSerialText('')
-    //     }
-    // };
+    const handleKeyPress = (e) => {
+        console.log(e.code, 'this/.....')
+        if (e.code === 'Enter' && currentSerialTextRef.current) {
+            onAddSerial()
+            // setCurrentSerialText('')
+        }
+    };
 
-    // React.useEffect(() => {
-    //     document.addEventListener('keyup', handleKeyPress);
-    //     return () => document.removeEventListener('keyup', handleKeyPress);
-    // }, []);
+    React.useEffect(() => {
+        document.addEventListener('keyup', handleKeyPress);
+        return () => document.removeEventListener('keyup', handleKeyPress);
+    }, []);
 
     return (
         <div className='site-card-border-less-wrapper'>
