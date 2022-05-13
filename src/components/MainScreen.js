@@ -21,6 +21,7 @@ const MainScreen = ({ userData }) => {
     const [warehouses, setWarehouses] = useState([]);
     const [status, setStatus] = useState(null)
     const [clearText, setClearText] = useState(0);
+    const [decodeValues, setDecodeValues] = useState({})
 
     const selectedSerialKeyRef = React.useRef(null);
     const currentSerialTextRef = React.useRef(null);
@@ -30,7 +31,7 @@ const MainScreen = ({ userData }) => {
 
     const [form] = Form.useForm();
 
-    console.log(serials?.serial, "+++++++++");
+    console.log(decodeValues, "decodeeeeeeeee");
     // console.log(currentSerialText, "------------");
 
 
@@ -157,6 +158,7 @@ const MainScreen = ({ userData }) => {
     };
 
     React.useEffect(() => {
+        axios.get(`grnserial-conversion/?company=${52}`).then((e) => setDecodeValues(e.data))
         document.addEventListener('keyup', handleKeyPress);
         return () => document.removeEventListener('keyup', handleKeyPress);
     }, []);
@@ -229,7 +231,7 @@ const MainScreen = ({ userData }) => {
                                                             ]}
                                                             className={selectedSerialKey === item.$key ? 'active' : ''}>
                                                             <List.Item.Meta
-                                                                title={<p className='serials-title'> {item.serial}</p>}
+                                                                title={<p className='serials-title'> { decodeValues[item.serial]|| item.serial}</p>}
                                                             />
 
                                                         </List.Item>
