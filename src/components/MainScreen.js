@@ -203,7 +203,7 @@ const MainScreen = ({ userData }) => {
                             {
                                 (serials.length) ?
                                     <div key={String($forceRerenderKey)}>
-                                        <Divider orientation="left">Serials
+                                        <Divider orientation="left">Total Serial Count
                                         (Count: {serials?.length})</Divider>
                                         {
 
@@ -231,7 +231,7 @@ const MainScreen = ({ userData }) => {
                                                             ]}
                                                             className={selectedSerialKey === item.$key ? 'active' : ''}>
                                                             <List.Item.Meta
-                                                                title={<p className='serials-title'> { decodeValues[item.serial]|| item.serial}</p>}
+                                                                title={<p className='serials-title'> { decodeValues[item.serial]&&(decodeValues[item.serial][0])|| item.serial}</p>}
                                                             />
 
                                                         </List.Item>
