@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
-import { List, Divider, Button, Row, Col, Empty, Card, Form, Select, Input, notification, message } from 'antd';
+import { List, Divider, Button, Row, Col, Empty, Card, Form, Select, Input, notification, message, Table, } from 'antd';
 import VirtualList from 'rc-virtual-list';
 import axios from 'axios';
 
 const { Option } = Select;
+
+
 
 
 const statusValues = {
@@ -22,6 +24,7 @@ const MainScreen = ({ userData }) => {
     const [status, setStatus] = useState(null)
     const [clearText, setClearText] = useState(0);
     const [decodeValues, setDecodeValues] = useState({})
+    const [assetType, setAssetType] = useState({})
 
     const selectedSerialKeyRef = React.useRef(null);
     const currentSerialTextRef = React.useRef(null);
@@ -31,8 +34,20 @@ const MainScreen = ({ userData }) => {
 
     const [form] = Form.useForm();
 
+
     console.log(decodeValues, "decodeeeeeeeee");
-    // console.log(currentSerialText, "------------");
+    console.log(assetType, "asettttttttttttttttt");
+
+    const columns = [
+        {
+            title: 'Asset Type',
+            dataIndex: assetType[1],
+        },
+        {
+            title: 'Count',
+            dataIndex: 'count',
+        },
+    ];
 
 
 
@@ -44,6 +59,7 @@ const MainScreen = ({ userData }) => {
 
     const reset = () => {
         setSerials([]);
+        setAssetType({});
         setCurrentSerialText('');
         setSelectedWarehouse(null);
         setStatus(statusValues.stop);
@@ -52,7 +68,7 @@ const MainScreen = ({ userData }) => {
         form.setFieldsValue({ rfId: '', warehouse: null })
     }
 
-     const removeDuplicateItems = (arr, key) => {
+    const removeDuplicateItems = (arr, key) => {
         const newArr = new Map(arr.map((item) => [item[key], item])).values();
         return [...newArr];
     };
@@ -73,7 +89,7 @@ const MainScreen = ({ userData }) => {
             setCurrentSerialText('')
         }
 
-        if (currentSerialTextRef.current ==  serials) {
+        if (currentSerialTextRef.current == serials) {
             console.log("serial exist");
         }
         else {
@@ -91,6 +107,7 @@ const MainScreen = ({ userData }) => {
 
 
     const onAddSerial = (e) => {
+        const currentDecodeArr = decodeValues[currentSerialTextRef.current];
         if (selectedSerialKeyRef.current !== null && findSerial) {
             setClearText(prev => prev + 1);
             setSerials(serials.map(item => {
@@ -98,20 +115,29 @@ const MainScreen = ({ userData }) => {
                     return {
                         ...item,
                         serial: currentSerialTextRef.current,
+
                     }
                 } else {
                     return item
                 }
             }))
             setSelectedSerialKey(null);
+
         } else {
             setClearText(prev => prev + 1);
             setSerials((prev) => (removeDuplicateItems([...prev, { serial: currentSerialTextRef.current, $key: Math.random() }], 'serial')))
+            if (currentDecodeArr) {
+                setAssetType((prev) => ({
+                    ...prev, [currentDecodeArr[1]]: prev[currentDecodeArr[1]] ?
+                        (prev[currentDecodeArr[1]] + 1) : 1
+
+                }))
+            }
         }
         forceRerender()
         // setCurrentSerialText('');
     }
-   
+
 
     const deleteItem = (key) => {
         setSerials((prev) => (prev.filter(item => item.$key !== key)));
@@ -199,12 +225,31 @@ const MainScreen = ({ userData }) => {
                                 {selectedSerialKey ? 'Edit' : 'Add'}
                             </Button>
                         </Form>
+                        {/* <h3 style={{ marginTop: '25px' }} >Asset Type and Count</h3> */}
+                        {/* <Table columns={columns} dataSource={currentDecodeArr} size="small"
+                            key={String($forceRerenderKey) + 'counttable'}/> */}
+                        <br />
+                        {Object.keys(assetType).length > 0 && <Row className='bg-light px-2 py-1'>
+                            <Col span={12}>
+                                <b>Asset Type</b>
+                            </Col>
+                            <Col span={12}>
+                                <b>Count</b>
+                            </Col>
+                        </Row>}
+                        <div className='border' key={String($forceRerenderKey) + 'countTable'}>
+                            {Object.keys(assetType).map((key) => (<Row key={key} className='px-2'>
+                                <Col span={12}>{key}</Col>
+                                <Col span={12}>{assetType[key]}</Col>
+                            </Row>))
+                            }
+                        </div>
                         <div>
                             {
                                 (serials.length) ?
                                     <div key={String($forceRerenderKey)}>
                                         <Divider orientation="left">Total Serial Count
-                                        (Count: {serials?.length})</Divider>
+                                            (Count: {serials?.length})</Divider>
                                         {
 
                                             <div className='scroll-view'>
@@ -231,7 +276,8 @@ const MainScreen = ({ userData }) => {
                                                             ]}
                                                             className={selectedSerialKey === item.$key ? 'active' : ''}>
                                                             <List.Item.Meta
-                                                                title={<p className='serials-title'> { decodeValues[item.serial]&&(decodeValues[item.serial][0])|| item.serial}</p>}
+                                                                title={<p className='serials-title'> {
+                                                                    decodeValues[item.serial] && (decodeValues[item.serial][0]) || item.serial}</p>}
                                                             />
 
                                                         </List.Item>
