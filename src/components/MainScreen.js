@@ -143,7 +143,7 @@ const MainScreen = ({ userData }) => {
         if (selectedDecodeValue && assetType[selectedDecodeValue[1]]) {
             setAssetType((prev) => ({
                 ...prev,
-                ...(prev[selectedDecodeValue[1]] && { [selectedDecodeValue[1]]: prev[selectedDecodeValue[serial][1]] - 1 })
+                ...(prev[selectedDecodeValue[1]] && { [selectedDecodeValue[1]]: prev[selectedDecodeValue[1]] - 1 })
             }
             ))
         }
