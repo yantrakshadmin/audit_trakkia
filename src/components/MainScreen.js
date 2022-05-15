@@ -25,7 +25,7 @@ const MainScreen = ({ userData }) => {
     const [clearText, setClearText] = useState(0);
     const [decodeValues, setDecodeValues] = useState({})
     const [assetType, setAssetType] = useState({})
-
+    const [addedSerials, setAddedSerials] = useState({})
     const selectedSerialKeyRef = React.useRef(null);
     const currentSerialTextRef = React.useRef(null);
     selectedSerialKeyRef.current = selectedSerialKey;
@@ -33,7 +33,6 @@ const MainScreen = ({ userData }) => {
 
 
     const [form] = Form.useForm();
-
 
     console.log(decodeValues, "decodeeeeeeeee");
     console.log(assetType, "asettttttttttttttttt");
@@ -102,16 +101,14 @@ const MainScreen = ({ userData }) => {
         console.log(selectedWarehouse, '00000')
     }, [selectedWarehouse])
 
-    const findSerial = serials.some(val => val.serial !== currentSerialText)
-    // console.log(findSerial, "finddddddddddd");
 
 
     const onAddSerial = (e) => {
         const currentDecodeArr = decodeValues[currentSerialTextRef.current];
-        if (selectedSerialKeyRef.current !== null && findSerial) {
+        if (selectedSerialKeyRef.current !== null) {
             setClearText(prev => prev + 1);
             setSerials(serials.map(item => {
-                if (item.$key === selectedSerialKeyRef.current && findSerial) {
+                if (item.$key === selectedSerialKeyRef.current) {
                     return {
                         ...item,
                         serial: currentSerialTextRef.current,
@@ -124,22 +121,32 @@ const MainScreen = ({ userData }) => {
             setSelectedSerialKey(null);
 
         } else {
+            setAddedSerials(prev => ({ ...prev, [currentSerialTextRef.current]: true }));
             setClearText(prev => prev + 1);
             setSerials((prev) => (removeDuplicateItems([...prev, { serial: currentSerialTextRef.current, $key: Math.random() }], 'serial')))
-            if (currentDecodeArr) {
+            console.log(addedSerials)
+            if (currentDecodeArr && !addedSerials[currentSerialTextRef.current]) {
                 setAssetType((prev) => ({
                     ...prev, [currentDecodeArr[1]]: prev[currentDecodeArr[1]] ?
                         (prev[currentDecodeArr[1]] + 1) : 1
-
                 }))
             }
         }
-        forceRerender()
+        forceRerender();
         // setCurrentSerialText('');
     }
 
 
-    const deleteItem = (key) => {
+    const deleteItem = (key, serial) => {
+        const selectedDecodeValue = decodeValues[serial];
+        console.log(selectedDecodeValue, '=====')
+        if (selectedDecodeValue && assetType[selectedDecodeValue[1]]) {
+            setAssetType((prev) => ({
+                ...prev,
+                ...(prev[selectedDecodeValue[1]] && { [selectedDecodeValue[1]]: prev[selectedDecodeValue[serial][1]] - 1 })
+            }
+            ))
+        }
         setSerials((prev) => (prev.filter(item => item.$key !== key)));
         if (key === selectedSerialKey) {
             setSelectedSerialKey(null);
@@ -271,7 +278,7 @@ const MainScreen = ({ userData }) => {
                                                                 />,
                                                                 <DeleteOutlined
                                                                     disabled={status !== status.start}
-                                                                    onClick={() => { deleteItem(item.$key) }}
+                                                                    onClick={() => { deleteItem(item.$key, item.serial) }}
                                                                 />
                                                             ]}
                                                             className={selectedSerialKey === item.$key ? 'active' : ''}>
