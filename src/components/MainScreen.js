@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
-import { List, Divider, Button, Row, Col, Empty, Card, Form, Select, Input, notification, message, Table, } from 'antd';
-import VirtualList from 'rc-virtual-list';
+import { List, Divider, Button, Row, Col, Empty, Card, Form, Select, Input, notification, message, Table, Space, } from 'antd';
 import axios from 'axios';
+import { getUser } from '../helpers/login';
+
 
 const { Option } = Select;
+const { user_Id } = getUser;
 
 
 
@@ -17,19 +19,20 @@ const statusValues = {
 const MainScreen = ({ userData }) => {
     const [serials, setSerials] = useState([]);
     const [$forceRerenderKey, setForceRerenderKey] = useState(Math.random())
-    const [currentSerialText, setCurrentSerialText] = useState('')
-    const [selectedSerialKey, setSelectedSerialKey] = useState(null);
+    // const [currentSerialText, setCurrentSerialText] = useState('')
+    // const [selectedSerialKey, setSelectedSerialKey] = useState(null);
     const [selectedWarehouse, setSelectedWarehouse] = useState(null);
     const [warehouses, setWarehouses] = useState([]);
     const [status, setStatus] = useState(null)
-    const [clearText, setClearText] = useState(0);
+    // const [clearText, setClearText] = useState(0);
     const [decodeValues, setDecodeValues] = useState({})
     const [assetType, setAssetType] = useState({})
     const [addedSerials, setAddedSerials] = useState({})
-    const selectedSerialKeyRef = React.useRef(null);
-    const currentSerialTextRef = React.useRef(null);
-    selectedSerialKeyRef.current = selectedSerialKey;
-    currentSerialTextRef.current = currentSerialText;
+
+    // const selectedSerialKeyRef = React.useRef(null);
+    // const currentSerialTextRef = React.useRef(null);
+    // selectedSerialKeyRef.current = selectedSerialKey;
+    // currentSerialTextRef.current = currentSerialText;
 
 
     const [form] = Form.useForm();
@@ -50,6 +53,7 @@ const MainScreen = ({ userData }) => {
 
 
 
+    console.log(user_Id, "uwrrrrrrrrrrrr");
 
 
     const forceRerender = () => {
@@ -59,10 +63,10 @@ const MainScreen = ({ userData }) => {
     const reset = () => {
         setSerials([]);
         setAssetType({});
-        setCurrentSerialText('');
+        // setCurrentSerialText('');
         setSelectedWarehouse(null);
         setStatus(statusValues.stop);
-        setSelectedSerialKey(null);
+        // setSelectedSerialKey(null);
         setForceRerenderKey(Math.random());
         form.setFieldsValue({ rfId: '', warehouse: null })
     }
@@ -79,61 +83,46 @@ const MainScreen = ({ userData }) => {
         setStatus(statusValues.start);
     };
 
-    const handleRFIDChange = (e) => { setCurrentSerialText(e.target.value); };
+    // const handleRFIDChange = (e) => { setCurrentSerialText(e.target.value); };
 
-    useEffect(() => {
-        handelWarehouse();
-        if (clearText > 0) {
-            form.setFieldsValue({ rfId: '' })
-            setCurrentSerialText('')
-        }
+    // useEffect(() => {
+    //     handelWarehouse();
+    //     if (clearText > 0) {
+    //         form.setFieldsValue({ rfId: '' })
+    //         setCurrentSerialText('')
+    //     }
 
-        if (currentSerialTextRef.current == serials) {
-            console.log("serial exist");
-        }
-        else {
-            console.log("serial not exist");
-        }
 
-    }, [clearText])
+    // }, [clearText])
 
     React.useEffect(() => {
+        handelWarehouse();
         console.log(selectedWarehouse, '00000')
     }, [selectedWarehouse])
 
 
 
-    const onAddSerial = (e) => {
-        const currentDecodeArr = decodeValues[currentSerialTextRef.current];
-        if (selectedSerialKeyRef.current !== null) {
-            setClearText(prev => prev + 1);
-            setSerials(serials.map(item => {
-                if (item.$key === selectedSerialKeyRef.current) {
-                    return {
-                        ...item,
-                        serial: currentSerialTextRef.current,
+    const onAddSerial = (value) => {
+        const currentDecodeArr = decodeValues[value];
+        // setClearText(prev => prev + 1);
+        // setSerials(serials.map(item => {
+    
+        setAddedSerials(prev => ({ ...prev, [value]: true }));
+         
+        setSerials((prev) => (removeDuplicateItems([...prev, { serial: value, $key: Math.random() }], 'serial')))
+        form.setFieldsValue({ rfId: '' })
 
-                    }
-                } else {
-                    return item
-                }
+        console.log(addedSerials)
+        if (currentDecodeArr && !addedSerials[value]) {
+            setAssetType((prev) => ({
+                ...prev, [currentDecodeArr[1]]: prev[currentDecodeArr[1]] ?
+                    (prev[currentDecodeArr[1]] + 1) : 1
             }))
-            setSelectedSerialKey(null);
-
-        } else {
-            setAddedSerials(prev => ({ ...prev, [currentSerialTextRef.current]: true }));
-            setClearText(prev => prev + 1);
-            setSerials((prev) => (removeDuplicateItems([...prev, { serial: currentSerialTextRef.current, $key: Math.random() }], 'serial')))
-            console.log(addedSerials)
-            if (currentDecodeArr && !addedSerials[currentSerialTextRef.current]) {
-                setAssetType((prev) => ({
-                    ...prev, [currentDecodeArr[1]]: prev[currentDecodeArr[1]] ?
-                        (prev[currentDecodeArr[1]] + 1) : 1
-                }))
-            }
+            
+            // }
+            forceRerender();
+            // setCurrentSerialText('');
         }
-        forceRerender();
-        // setCurrentSerialText('');
     }
 
 
@@ -148,9 +137,9 @@ const MainScreen = ({ userData }) => {
             ))
         }
         setSerials((prev) => (prev.filter(item => item.$key !== key)));
-        if (key === selectedSerialKey) {
-            setSelectedSerialKey(null);
-        }
+        // if (key === selectedSerialKey) {
+        //     setSelectedSerialKey(null);
+        // }
     }
 
     const onSubmit = async () => {
@@ -184,11 +173,11 @@ const MainScreen = ({ userData }) => {
 
     const handleKeyPress = (e) => {
         console.log(e.code, 'this/.....')
-        if (e.code === 'Enter' && currentSerialTextRef.current) {
-            onAddSerial()
-            // setCurrentSerialText('')
+        if (e.code === 'Enter') {
+            form.submit()
         }
-    };
+    };  
+
 
     React.useEffect(() => {
         axios.get(`grnserial-conversion/?company=${52}`).then((e) => setDecodeValues(e.data))
@@ -202,7 +191,13 @@ const MainScreen = ({ userData }) => {
             <Row justify='center'>
                 <Col  {...{ md: 12, sm: 24, lg: 12, xl: 12 }}>
                     <Card title="Audit" bordered={false}>
-                        <Form layout='vertical' form={form}>
+                        <Form layout='vertical' form={form} onFinish={(data) => {
+                            console.log(data, "formmm dataaaaaaa ++++++++++++"); 
+
+                            if (data.rfId) {
+                                onAddSerial(data.rfId)
+                            }
+                        }}>
                             <Form.Item name="warehouse" label="Select Warehouse">
                                 <Select
                                     placeholder="Select Warehouse"
@@ -215,22 +210,28 @@ const MainScreen = ({ userData }) => {
                                     }
                                 </Select>
                             </Form.Item>
-                            <Form.Item name="rfId" label="">
+                            <Form.Item name="rfId"  label="">
                                 <Input
-                                    key={`input-${selectedSerialKey}`}
+                                    // key={`input-${selectedSerialKey}`}
                                     disabled={!selectedWarehouse || status !== statusValues.start}
                                     placeholder="Enter RFID"
-                                    value={currentSerialText}
-                                    onChange={handleRFIDChange}
+                                    maxLength={24}
+                                    // value={currentSerialText}
+                                    // onChange={handleRFIDChange}
                                 />
                             </Form.Item>
-                            <Button
-                                disabled={status !== statusValues.start}
-                                block
-                                onClick={onAddSerial}
-                                type='primary'>
-                                {selectedSerialKey ? 'Edit' : 'Add'}
-                            </Button>
+                            <Form.Item >
+                                <Button
+                                    disabled={status !== statusValues.start}
+                                    block
+                                    // onClick={onAddSerial}
+                                    htmlType='submit'
+                                    type='primary'>
+                                    {/* {selectedSerialKey ? 'Edit' : 'Add'} */}
+                                    Add
+                                </Button>
+                            </Form.Item>    
+                           
                         </Form>
                         {/* <h3 style={{ marginTop: '25px' }} >Asset Type and Count</h3> */}
                         {/* <Table columns={columns} dataSource={currentDecodeArr} size="small"
@@ -268,20 +269,21 @@ const MainScreen = ({ userData }) => {
                                                     renderItem={(item) => (
                                                         <List.Item
                                                             actions={[
-                                                                <EditOutlined
-                                                                    disabled={status !== status.start}
-                                                                    onClick={() => {
-                                                                        setSelectedSerialKey(item.$key);
-                                                                        setCurrentSerialText(item.serial)
-                                                                    }}
+                                                                // <EditOutlined
+                                                                //     disabled={status !== status.start}
+                                                                //     onClick={() => {
+                                                                //         // setSelectedSerialKey(item.$key);
+                                                                //         // setCurrentSerialText(item.serial)
+                                                                //     }}
 
-                                                                />,
+                                                                // />,
                                                                 <DeleteOutlined
                                                                     disabled={status !== status.start}
                                                                     onClick={() => { deleteItem(item.$key, item.serial) }}
                                                                 />
                                                             ]}
-                                                            className={selectedSerialKey === item.$key ? 'active' : ''}>
+                                                            // className={selectedSerialKey === item.$key ? 'active' : ''}
+                                                        >
                                                             <List.Item.Meta
                                                                 title={<p className='serials-title'> {
                                                                     decodeValues[item.serial] && (decodeValues[item.serial][0]) || item.serial}</p>}
@@ -346,6 +348,4 @@ const MainScreen = ({ userData }) => {
     )
 }
 
-export default MainScreen;
-
-
+    export default MainScreen;
