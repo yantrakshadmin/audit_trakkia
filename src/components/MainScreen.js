@@ -35,7 +35,14 @@ const MainScreen = ({ userData }) => {
     // currentSerialTextRef.current = currentSerialText;
 
 
-    const [form] = Form.useForm();
+    const [form] = Form.useForm();  
+
+    let Pallet = Object.values(decodeValues).filter((e) => e[1] == "Plastic Pallet").length;
+    let BlueRack = Object.values(decodeValues).filter((e) => e[1] == "Blue Racks").length;
+    let HPT = Object.values(decodeValues).filter((e) => e[1] == "HPT").length;
+    let Trolley = Object.values(decodeValues).filter((e) => e[1] == "Trolley").length;
+
+    console.log(Pallet, BlueRack, HPT, Trolley, "pallllllttttt");
 
     console.log(decodeValues, "decodeeeeeeeee");
     console.log(assetType, "asettttttttttttttttt");
@@ -238,19 +245,32 @@ const MainScreen = ({ userData }) => {
                             key={String($forceRerenderKey) + 'counttable'}/> */}
                         <br />
                         {Object.keys(assetType).length > 0 && <Row className='bg-light px-2 py-1'>
-                            <Col span={12}>
+                            <Col span={8}>
                                 <b>Asset Type</b>
                             </Col>
-                            <Col span={12}>
+                            <Col span={8}>
                                 <b>Count</b>
+                            </Col>
+                            <Col span={8}>
+                                <b>Scanned Percentage</b>
                             </Col>
                         </Row>}
                         <div className='border' key={String($forceRerenderKey) + 'countTable'}>
                             {Object.keys(assetType).map((key) => (<Row key={key} className='px-2'>
-                                <Col span={12}>{key}</Col>
-                                <Col span={12}>{assetType[key]}</Col>
+                                <Col span={8}>{key}</Col>
+                                <Col span={8}>{assetType[key]}</Col>
+                                
+                                {key === "Plastic Pallet" ?
+                                    <Col span={8}>{(assetType[key] / Pallet * 100).toFixed(1)}%</Col> : ''}
+                                {key === "Trolley" ?
+                                    <Col span={8}>{(assetType[key] / Trolley * 100).toFixed(1)}%</Col> : ''}
+                                {key === "Blue Racks" ?
+                                    <Col span={8}>{(assetType[key] / BlueRack * 100).toFixed(1)}%</Col> : ''}
+                                {key === "HPT" ?
+                                    <Col span={8}>{(assetType[key] / HPT * 100).toFixed(1)}%</Col> : ''}
+
                             </Row>))
-                            }
+                            }   
                         </div>
                         <div>
                             {
