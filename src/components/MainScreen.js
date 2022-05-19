@@ -1,12 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
-import { List, Divider, Button, Row, Col, Empty, Card, Form, Select, Input, notification, message, Table, Space, } from 'antd';
+import React, { useState } from 'react';
+import {  DeleteOutlined } from '@ant-design/icons';
+import { List, Divider, Button, Row, Col, Empty, Card, Form, Select, Input,  message, } from 'antd';
 import axios from 'axios';
-import { getUser } from '../helpers/login';
 
 
 const { Option } = Select;
-const { user_Id } = getUser;
 
 
 
@@ -19,21 +17,14 @@ const statusValues = {
 const MainScreen = ({ userData }) => {
     const [serials, setSerials] = useState([]);
     const [$forceRerenderKey, setForceRerenderKey] = useState(Math.random())
-    // const [currentSerialText, setCurrentSerialText] = useState('')
-    // const [selectedSerialKey, setSelectedSerialKey] = useState(null);
+    
     const [selectedWarehouse, setSelectedWarehouse] = useState(null);
     const [warehouses, setWarehouses] = useState([]);
-    const [status, setStatus] = useState(null)
-    // const [clearText, setClearText] = useState(0);
+    const [status, setStatus] = useState(null);
+    const [addedItems, setAddedItems] = React.useState({})
     const [decodeValues, setDecodeValues] = useState({})
     const [assetType, setAssetType] = useState({})
     const [addedSerials, setAddedSerials] = useState({})
-
-    // const selectedSerialKeyRef = React.useRef(null);
-    // const currentSerialTextRef = React.useRef(null);
-    // selectedSerialKeyRef.current = selectedSerialKey;
-    // currentSerialTextRef.current = currentSerialText;
-
 
     const [form] = Form.useForm();  
 
@@ -42,27 +33,6 @@ const MainScreen = ({ userData }) => {
     let HPT = Object.values(decodeValues).filter((e) => e[1] == "HPT").length;
     let Trolley = Object.values(decodeValues).filter((e) => e[1] == "Trolley").length;
 
-    console.log(Pallet, BlueRack, HPT, Trolley, "pallllllttttt");
-
-    console.log(decodeValues, "decodeeeeeeeee");
-    console.log(assetType, "asettttttttttttttttt");
-
-    const columns = [
-        {
-            title: 'Asset Type',
-            dataIndex: assetType[1],
-        },
-        {
-            title: 'Count',
-            dataIndex: 'count',
-        },
-    ];
-
-
-
-    console.log(user_Id, "uwrrrrrrrrrrrr");
-
-
     const forceRerender = () => {
         setForceRerenderKey(Math.random());
     }
@@ -70,10 +40,10 @@ const MainScreen = ({ userData }) => {
     const reset = () => {
         setSerials([]);
         setAssetType({});
-        // setCurrentSerialText('');
+        setAddedItems({});
+        setAddedSerials({});
         setSelectedWarehouse(null);
         setStatus(statusValues.stop);
-        // setSelectedSerialKey(null);
         setForceRerenderKey(Math.random());
         form.setFieldsValue({ rfId: '', warehouse: null })
     }
@@ -90,46 +60,25 @@ const MainScreen = ({ userData }) => {
         setStatus(statusValues.start);
     };
 
-    // const handleRFIDChange = (e) => { setCurrentSerialText(e.target.value); };
-
-    // useEffect(() => {
-    //     handelWarehouse();
-    //     if (clearText > 0) {
-    //         form.setFieldsValue({ rfId: '' })
-    //         setCurrentSerialText('')
-    //     }
-
-
-    // }, [clearText])
-
     React.useEffect(() => {
         handelWarehouse();
-        console.log(selectedWarehouse, '00000')
     }, [selectedWarehouse])
 
 
 
     const onAddSerial = (value) => {
         const currentDecodeArr = decodeValues[value];
-        // setClearText(prev => prev + 1);
-        // setSerials(serials.map(item => {
-    
-        setAddedSerials(prev => ({ ...prev, [value]: true }));
-         
-        setSerials((prev) => (removeDuplicateItems([...prev, { serial: value, $key: Math.random() }], 'serial')))
         form.setFieldsValue({ rfId: '' })
-
-        console.log(addedSerials)
-        if (currentDecodeArr && !addedSerials[value]) {
+        if (currentDecodeArr && !addedSerials[value] && !addedItems[currentDecodeArr[0]]) {
+            setAddedSerials(prev => ({ ...prev, [value]: true }));
+            setSerials((prev) => (removeDuplicateItems([...prev, { serial: value, $key: Math.random() }], 'serial')))            
+            setAddedItems(prev => ({...prev, [currentDecodeArr[0]]:true}));
             setAssetType((prev) => ({
                 ...prev, [currentDecodeArr[1]]: prev[currentDecodeArr[1]] ?
                     (prev[currentDecodeArr[1]] + 1) : 1
             }))
-            
-            // }
-            forceRerender();
-            // setCurrentSerialText('');
         }
+        forceRerender();
     }
 
 
@@ -144,9 +93,6 @@ const MainScreen = ({ userData }) => {
             ))
         }
         setSerials((prev) => (prev.filter(item => item.$key !== key)));
-        // if (key === selectedSerialKey) {
-        //     setSelectedSerialKey(null);
-        // }
     }
 
     const onSubmit = async () => {
@@ -160,13 +106,8 @@ const MainScreen = ({ userData }) => {
                 message.success("Scan success")
             })
             .catch((e) => {
-                // console.log(e);
                 message.warn("something went wrong")
             })
-        // setCurrentSerialText('')
-        //    openNotification('top')
-
-
     }
 
 
@@ -219,30 +160,22 @@ const MainScreen = ({ userData }) => {
                             </Form.Item>
                             <Form.Item name="rfId"  label="">
                                 <Input
-                                    // key={`input-${selectedSerialKey}`}
                                     disabled={!selectedWarehouse || status !== statusValues.start}
                                     placeholder="Enter RFID"
                                     maxLength={24}
-                                    // value={currentSerialText}
-                                    // onChange={handleRFIDChange}
                                 />
                             </Form.Item>
                             <Form.Item >
                                 <Button
                                     disabled={status !== statusValues.start}
                                     block
-                                    // onClick={onAddSerial}
                                     htmlType='submit'
                                     type='primary'>
-                                    {/* {selectedSerialKey ? 'Edit' : 'Add'} */}
                                     Add
                                 </Button>
                             </Form.Item>    
                            
                         </Form>
-                        {/* <h3 style={{ marginTop: '25px' }} >Asset Type and Count</h3> */}
-                        {/* <Table columns={columns} dataSource={currentDecodeArr} size="small"
-                            key={String($forceRerenderKey) + 'counttable'}/> */}
                         <br />
                         {Object.keys(assetType).length > 0 && <Row className='bg-light px-2 py-1'>
                             <Col span={8}>
@@ -289,20 +222,11 @@ const MainScreen = ({ userData }) => {
                                                     renderItem={(item) => (
                                                         <List.Item
                                                             actions={[
-                                                                // <EditOutlined
-                                                                //     disabled={status !== status.start}
-                                                                //     onClick={() => {
-                                                                //         // setSelectedSerialKey(item.$key);
-                                                                //         // setCurrentSerialText(item.serial)
-                                                                //     }}
-
-                                                                // />,
                                                                 <DeleteOutlined
                                                                     disabled={status !== status.start}
                                                                     onClick={() => { deleteItem(item.$key, item.serial) }}
                                                                 />
                                                             ]}
-                                                            // className={selectedSerialKey === item.$key ? 'active' : ''}
                                                         >
                                                             <List.Item.Meta
                                                                 title={<p className='serials-title'> {
