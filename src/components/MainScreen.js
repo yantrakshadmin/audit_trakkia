@@ -14,6 +14,19 @@ const statusValues = {
     stop: 'stop'
 }
 
+
+const getItemsLength = (decodeValues, type) => {
+    let len = 0;
+    let addedItems = {}
+    Object.values(decodeValues).map((e) => {
+        if (e[1] === type && !addedItems[e[0]]) {
+            len = len + 1;
+            addedItems = { ...addedItems, [e[0]]: true }
+        }
+    })
+    return len
+}
+
 const MainScreen = ({ userData }) => {
     const [serials, setSerials] = useState([]);
     const [$forceRerenderKey, setForceRerenderKey] = useState(Math.random())
@@ -27,11 +40,17 @@ const MainScreen = ({ userData }) => {
     const [addedSerials, setAddedSerials] = useState({})
 
     const [form] = Form.useForm();  
+    let checkObj = Object.values(decodeValues).map(e => e[0]);
+    let uniqueChars = [...new Set(checkObj)];
 
-    let Pallet = Object.values(decodeValues).filter((e) => e[1] == "Plastic Pallet").length;
-    let BlueRack = Object.values(decodeValues).filter((e) => e[1] == "Blue Racks").length;
-    let HPT = Object.values(decodeValues).filter((e) => e[1] == "HPT").length;
-    let Trolley = Object.values(decodeValues).filter((e) => e[1] == "Trolley").length;
+
+    // let Pallet = Object.values(decodeValues).filter((e) => e[1] == "Plastic Pallet").length;
+    let palletUnique = getItemsLength(decodeValues, 'Plastic Pallet');
+    let blueRackUnique = getItemsLength(decodeValues, 'Blue Racks');
+    let hPTUnique = getItemsLength(decodeValues, 'HPT');
+    let trolleyUnique = getItemsLength(decodeValues, 'Trolley');
+
+
 
     const forceRerender = () => {
         setForceRerenderKey(Math.random());
@@ -194,13 +213,13 @@ const MainScreen = ({ userData }) => {
                                 <Col span={8}>{assetType[key]}</Col>
                                 
                                 {key === "Plastic Pallet" ?
-                                    <Col span={8}>{(assetType[key] / Pallet * 100).toFixed(1)}%</Col> : ''}
+                                    <Col span={8}>{(assetType[key] / palletUnique * 100).toFixed(1)}%</Col> : ''}
                                 {key === "Trolley" ?
-                                    <Col span={8}>{(assetType[key] / Trolley * 100).toFixed(1)}%</Col> : ''}
+                                    <Col span={8}>{(assetType[key] / trolleyUnique * 100).toFixed(1)}%</Col> : ''}
                                 {key === "Blue Racks" ?
-                                    <Col span={8}>{(assetType[key] / BlueRack * 100).toFixed(1)}%</Col> : ''}
+                                    <Col span={8}>{(assetType[key] / blueRackUnique * 100).toFixed(1)}%</Col> : ''}
                                 {key === "HPT" ?
-                                    <Col span={8}>{(assetType[key] / HPT * 100).toFixed(1)}%</Col> : ''}
+                                    <Col span={8}>{(assetType[key] / hPTUnique * 100).toFixed(1)}%</Col> : ''}
 
                             </Row>))
                             }   

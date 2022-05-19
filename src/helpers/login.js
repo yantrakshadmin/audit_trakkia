@@ -22,6 +22,6 @@ export const initAxios = async () => {
     axios.defaults.baseURL = DEFAULT_BASE_URL;
     axios.defaults.headers.common['Authorization'] = `Bearer ${auth?.access}`
     axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
-    console.log(auth,'thisiii')
+    // console.log(auth,'thisiii')
     return auth;
 }
