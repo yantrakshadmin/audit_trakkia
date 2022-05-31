@@ -4,7 +4,7 @@ import {reactLocalStorage} from 'reactjs-localstorage';
 import {DEFAULT_BASE_URL} from '../enviornment'
 
 
-export const getUser = async () => axios.get(`${DEFAULT_BASE_URL}user/meta/`)
+export const getUser = async () => axios.get(`${DEFAULT_BASE_URL}user/meta/`);
 
 const getAuthToken = async () => {
     const access  = reactLocalStorage.get('access');

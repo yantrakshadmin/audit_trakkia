@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import {  DeleteOutlined } from '@ant-design/icons';
-import { List, Divider, Button, Row, Col, Empty, Card, Form, Select, Input,  message, } from 'antd';
+import { DeleteOutlined } from '@ant-design/icons';
+import { List, Divider, Button, Row, Col, Empty, Card, Form, Select, Input, message, } from 'antd';
 import axios from 'axios';
-
+import moment from "moment"
 
 const { Option } = Select;
 
@@ -30,18 +30,18 @@ const getItemsLength = (decodeValues, type) => {
 const MainScreen = ({ userData }) => {
     const [serials, setSerials] = useState([]);
     const [$forceRerenderKey, setForceRerenderKey] = useState(Math.random())
-    
     const [selectedWarehouse, setSelectedWarehouse] = useState(null);
     const [warehouses, setWarehouses] = useState([]);
     const [status, setStatus] = useState(null);
     const [addedItems, setAddedItems] = React.useState({})
     const [decodeValues, setDecodeValues] = useState({})
     const [assetType, setAssetType] = useState({})
-    const [addedSerials, setAddedSerials] = useState({})
+    const [addedSerials, setAddedSerials] = useState({});
+    // const [start, setStart] = useState('')
 
-    const [form] = Form.useForm();  
-    let checkObj = Object.values(decodeValues).map(e => e[0]);
-    let uniqueChars = [...new Set(checkObj)];
+    const [form] = Form.useForm();
+    // let checkObj = Object.values(decodeValues).map(e => e[0]);
+    // let uniqueChars = [...new Set(checkObj)];
 
 
     // let Pallet = Object.values(decodeValues).filter((e) => e[1] == "Plastic Pallet").length;
@@ -49,6 +49,7 @@ const MainScreen = ({ userData }) => {
     let blueRackUnique = getItemsLength(decodeValues, 'Blue Racks');
     let hPTUnique = getItemsLength(decodeValues, 'HPT');
     let trolleyUnique = getItemsLength(decodeValues, 'Trolley');
+  
 
 
 
@@ -90,8 +91,8 @@ const MainScreen = ({ userData }) => {
         form.setFieldsValue({ rfId: '' })
         if (currentDecodeArr && !addedSerials[value] && !addedItems[currentDecodeArr[0]]) {
             setAddedSerials(prev => ({ ...prev, [value]: true }));
-            setSerials((prev) => (removeDuplicateItems([...prev, { serial: value, $key: Math.random() }], 'serial')))            
-            setAddedItems(prev => ({...prev, [currentDecodeArr[0]]:true}));
+            setSerials((prev) => (removeDuplicateItems([...prev, { serial: value, $key: Math.random(), start: moment().toISOString() }], 'serial')))
+            setAddedItems(prev => ({ ...prev, [currentDecodeArr[0]]: true }));
             setAssetType((prev) => ({
                 ...prev, [currentDecodeArr[1]]: prev[currentDecodeArr[1]] ?
                     (prev[currentDecodeArr[1]] + 1) : 1
@@ -119,6 +120,7 @@ const MainScreen = ({ userData }) => {
             {
                 warehouse: selectedWarehouse?.id,
                 serials,
+              
             })
             .then((e) => {
                 reset();
@@ -143,7 +145,7 @@ const MainScreen = ({ userData }) => {
         if (e.code === 'Enter') {
             form.submit()
         }
-    };  
+    };
 
 
     React.useEffect(() => {
@@ -159,7 +161,7 @@ const MainScreen = ({ userData }) => {
                 <Col  {...{ md: 12, sm: 24, lg: 12, xl: 12 }}>
                     <Card title="Audit" bordered={false}>
                         <Form layout='vertical' form={form} onFinish={(data) => {
-                            console.log(data, "formmm dataaaaaaa ++++++++++++"); 
+                            console.log(data, "formmm dataaaaaaa ++++++++++++");
 
                             if (data.rfId) {
                                 onAddSerial(data.rfId)
@@ -177,7 +179,7 @@ const MainScreen = ({ userData }) => {
                                     }
                                 </Select>
                             </Form.Item>
-                            <Form.Item name="rfId"  label="">
+                            <Form.Item name="rfId" label="">
                                 <Input
                                     disabled={!selectedWarehouse || status !== statusValues.start}
                                     placeholder="Enter RFID"
@@ -192,8 +194,8 @@ const MainScreen = ({ userData }) => {
                                     type='primary'>
                                     Add
                                 </Button>
-                            </Form.Item>    
-                           
+                            </Form.Item>
+
                         </Form>
                         <br />
                         {Object.keys(assetType).length > 0 && <Row className='bg-light px-2 py-1'>
@@ -211,7 +213,7 @@ const MainScreen = ({ userData }) => {
                             {Object.keys(assetType).map((key) => (<Row key={key} className='px-2'>
                                 <Col span={8}>{key}</Col>
                                 <Col span={8}>{assetType[key]}</Col>
-                                
+
                                 {key === "Plastic Pallet" ?
                                     <Col span={8}>{(assetType[key] / palletUnique * 100).toFixed(1)}%</Col> : ''}
                                 {key === "Trolley" ?
@@ -222,7 +224,7 @@ const MainScreen = ({ userData }) => {
                                     <Col span={8}>{(assetType[key] / hPTUnique * 100).toFixed(1)}%</Col> : ''}
 
                             </Row>))
-                            }   
+                            }
                         </div>
                         <div>
                             {
@@ -311,4 +313,4 @@ const MainScreen = ({ userData }) => {
     )
 }
 
-    export default MainScreen;
+export default MainScreen;
