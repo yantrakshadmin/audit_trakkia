@@ -91,7 +91,10 @@ const MainScreen = ({ userData }) => {
         form.setFieldsValue({ rfId: '' })
         if (currentDecodeArr && !addedSerials[value] && !addedItems[currentDecodeArr[0]]) {
             setAddedSerials(prev => ({ ...prev, [value]: true }));
-            setSerials((prev) => (removeDuplicateItems([...prev, { serial: value, $key: Math.random(), start: moment().toISOString() }], 'serial')))
+            setSerials((prev) => (removeDuplicateItems([...prev, {
+                serial: value,
+                start: moment().toISOString()
+            }], 'serial')))
             setAddedItems(prev => ({ ...prev, [currentDecodeArr[0]]: true }));
             setAssetType((prev) => ({
                 ...prev, [currentDecodeArr[1]]: prev[currentDecodeArr[1]] ?
@@ -120,6 +123,9 @@ const MainScreen = ({ userData }) => {
             {
                 warehouse: selectedWarehouse?.id,
                 serials,
+                start_time: serials[0].start,
+                end_time: serials[serials.length - 1].start,
+
               
             })
             .then((e) => {
