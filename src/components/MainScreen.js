@@ -3,10 +3,11 @@ import { DeleteOutlined } from '@ant-design/icons';
 import { List, Divider, Button, Row, Col, Empty, Card, Form, Select, Input, message, } from 'antd';
 import axios from 'axios';
 import moment from "moment"
+// import useGeoLocation from "hooks/useGeoLocation";
+import useGeoLocation from "./useGeoLocation";
+
 
 const { Option } = Select;
-
-
 
 
 const statusValues = {
@@ -37,6 +38,8 @@ const MainScreen = ({ userData }) => {
     const [decodeValues, setDecodeValues] = useState({})
     const [assetType, setAssetType] = useState({})
     const [addedSerials, setAddedSerials] = useState({});
+    const location = useGeoLocation();
+
     // const [start, setStart] = useState('')
 
     const [form] = Form.useForm();
@@ -263,6 +266,7 @@ const MainScreen = ({ userData }) => {
                                                         </List.Item>
                                                     )} />
                                             </div>
+                                            
 
                                         }
                                     </div> :
@@ -280,6 +284,22 @@ const MainScreen = ({ userData }) => {
                             }
                         </div>
                         <br />
+
+
+                        <div className="row d-flex justify-content-center mt-3 mb-5 pb-5">
+                            <div className="col-6">
+                                <div class="card">
+                                    <div class="card-header text-left font-weight-bold d-flex">
+                                        <div className="inline-block mr-auto pt-1">
+                                            {location.loaded
+                                                ? JSON.stringify(location)
+                                                : "Location data not available yet."}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
                         <div className=''>
                             {status !== statusValues.start &&
                                 <Button
@@ -316,6 +336,8 @@ const MainScreen = ({ userData }) => {
                 </Col>
             </Row>
         </div>
+
+        
     )
 }
 
