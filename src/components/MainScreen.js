@@ -262,7 +262,7 @@ const MainScreen = ({ userData }) => {
                                                         >
                                                             <List.Item.Meta
                                                                 title={<p className='serials-title'> {
-                                                                    decodeValues[item.serial] && (decodeValues[item.serial][0]) || item.serial} {item.coordinate}
+                                                                    decodeValues[item.serial] && (decodeValues[item.serial][0]) || item.serial} 
                                                                 </p>}
                                                             />
 
@@ -293,11 +293,11 @@ const MainScreen = ({ userData }) => {
                             <div className="col-6">
                                 <div class="card">
                                     <div class="card-header text-left font-weight-bold d-flex">
-                                        <div className="inline-block mr-auto pt-1">
+                                        {/* <div className="inline-block mr-auto pt-1">
                                             {location.loaded
                                                 ? JSON.stringify(location)
                                                 : "Location data not available yet."}
-                                        </div>
+                                        </div> */}
                                     </div>
                                 </div>
                             </div>
