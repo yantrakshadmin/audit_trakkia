@@ -96,8 +96,10 @@ const MainScreen = ({ userData }) => {
             setAddedSerials(prev => ({ ...prev, [value]: true }));
             setSerials((prev) => (removeDuplicateItems([...prev, {
                 serial: value,
-                start: moment().toISOString()
-            }], 'serial')))
+                start: moment().toISOString(),
+                coordinate: JSON.stringify(Object.values(location.coordinates)) 
+            }],
+                'serial')))
             setAddedItems(prev => ({ ...prev, [currentDecodeArr[0]]: true }));
             setAssetType((prev) => ({
                 ...prev, [currentDecodeArr[1]]: prev[currentDecodeArr[1]] ?
@@ -260,7 +262,8 @@ const MainScreen = ({ userData }) => {
                                                         >
                                                             <List.Item.Meta
                                                                 title={<p className='serials-title'> {
-                                                                    decodeValues[item.serial] && (decodeValues[item.serial][0]) || item.serial}</p>}
+                                                                    decodeValues[item.serial] && (decodeValues[item.serial][0]) || item.serial} {item.coordinate}
+                                                                </p>}
                                                             />
 
                                                         </List.Item>
