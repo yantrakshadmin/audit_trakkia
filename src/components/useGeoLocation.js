@@ -5,7 +5,6 @@ const useGeoLocation = () => {
 
     const onSuccess = (location) => {
         setLocation({
-            // loaded: true,
             coordinates: {
                 lat: location.coords.latitude,
                 lng: location.coords.longitude,
@@ -24,7 +23,8 @@ const useGeoLocation = () => {
         });
     };
 
-    const getLocation = () => {     
+    const getLocation = async () => {  
+        let temLocation;
         if (!("geolocation" in navigator)) {
             onError({error: {
                 code: 0,
@@ -32,7 +32,13 @@ const useGeoLocation = () => {
             }})
         }
 
-        navigator.geolocation.getCurrentPosition(onSuccess, onError);
+        await navigator.geolocation.getCurrentPosition((l) => {
+            onSuccess(l)
+            console.log(l, "llllllllllllll");
+            temLocation = l;
+          
+        }, onError);
+        console.log(temLocation,"tempppppppppppp");
     }
 
    return { getLocation, location}

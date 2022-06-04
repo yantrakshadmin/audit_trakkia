@@ -37,6 +37,7 @@ const MainScreen = ({ userData }) => {
   const [addedSerials, setAddedSerials] = useState({});
   const [TypesToMap, setTypesToMap] = useState({});
   const [loading, setLoading] = useState(false);
+  const [submitData, setSubmitData] = useState(null);
   const {getLocation, location}= useGeoLocation();
 
   // const [start, setStart] = useState('')
@@ -62,7 +63,7 @@ const MainScreen = ({ userData }) => {
 
   const setGeoLocation = (location) => {
       console.log(location, "location set geolocation")
-      if (location?.coordinates){return JSON.stringify(Object.values(location?.coordinates));}
+      if (location?.coordinates){return location?.coordinates?.lat + `,` + location?.coordinates?.lng }
       else {return ""}
     
   };
@@ -72,6 +73,7 @@ const MainScreen = ({ userData }) => {
   };
 
   const reset = () => {
+    setSubmitData(null)
     setSerials([]);
     setAssetType({});
     setAddedItems({});
@@ -96,6 +98,7 @@ const MainScreen = ({ userData }) => {
     setAddedItems({});
     setAddedSerials({});
     setForceRerenderKey(Math.random());
+    setSubmitData(null);
   };
 
   React.useEffect(() => {
@@ -132,6 +135,7 @@ const MainScreen = ({ userData }) => {
           ? prev[currentDecodeArr[1]] + 1
           : 1,
       }));
+    setSubmitData(null);
     }
     forceRerender();
   };
@@ -185,6 +189,13 @@ const MainScreen = ({ userData }) => {
   };
 
   React.useEffect(() => {
+    if (submitData) {
+       onAddSerial(submitData?.rfId);
+    }
+
+  },[location]);
+
+  React.useEffect(() => {
     axios.get(`grnserial-conversion/?company=${52}`).then((e) => {
       let uniqueType = {};
       Object.keys(e.data).map(
@@ -210,8 +221,9 @@ const MainScreen = ({ userData }) => {
               form={form}
               onFinish={(data) => {
                 
-                if (data.rfId) {getLocation();
-                  onAddSerial(data.rfId);
+                if (data.rfId) {
+                  getLocation();
+               setSubmitData(data)
                 }
               }}
             >
