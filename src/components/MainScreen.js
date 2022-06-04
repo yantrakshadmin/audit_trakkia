@@ -348,8 +348,8 @@ const MainScreen = ({ userData }) => {
                                   {' '}
                                   {(decodeValues[item.serial] &&
                                     decodeValues[item.serial][0]) ||
-                                    item.serial}{' '}
-                                  {item.coordinate}
+                                    item.serial}
+                                  {/* {item.coordinate} */}
                                 </p>
                               }
                             />
