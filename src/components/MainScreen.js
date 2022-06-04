@@ -37,7 +37,7 @@ const MainScreen = ({ userData }) => {
   const [addedSerials, setAddedSerials] = useState({});
   const [TypesToMap, setTypesToMap] = useState({});
   const [loading, setLoading] = useState(false);
-  const {  getLocation}= useGeoLocation();
+  const {getLocation, location}= useGeoLocation();
 
   // const [start, setStart] = useState('')
   // console.log(decodeValues, 'decodeValues');
@@ -60,20 +60,11 @@ const MainScreen = ({ userData }) => {
     return len;
   };
 
-  // let Pallet = Object.values(decodeValues).filter((e) => e[1] == "Plastic Pallet").length;
-
-  let palletUnique = getItemsLength(decodeValues, 'Plastic Pallet');
-  let blueRackUnique = getItemsLength(decodeValues, 'Blue Racks');
-  let hPTUnique = getItemsLength(decodeValues, 'HPT');
-  let trolleyUnique = getItemsLength(decodeValues, 'Trolley');
-
-  // let selectedItem = Object.keys(assetType).map((key) => key);
-  // const itemsLength = getItemsLength(decodeValues, String(selectedItem))
-
-  // console.log(selectedItem, 'selectedItem');
-
   const setGeoLocation = (location) => {
-    return JSON.stringify(Object.values(location.coordinates));
+      console.log(location, "location set geolocation")
+      if (location?.coordinates){return JSON.stringify(Object.values(location?.coordinates));}
+      else {return ""}
+    
   };
 
   const forceRerender = () => {
@@ -112,7 +103,7 @@ const MainScreen = ({ userData }) => {
   }, [selectedWarehouse]);
 
   const onAddSerial = (value) => {
-    let location = getLocation()?.location;
+    console.log(location, "on add location")
     const currentDecodeArr = decodeValues[value];
     form.setFieldsValue({ rfId: '' });
     if (
@@ -218,9 +209,8 @@ const MainScreen = ({ userData }) => {
               layout="vertical"
               form={form}
               onFinish={(data) => {
-                // console.log(data, 'formmm dataaaaaaa ++++++++++++');
-
-                if (data.rfId) {
+                
+                if (data.rfId) {getLocation();
                   onAddSerial(data.rfId);
                 }
               }}
