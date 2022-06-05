@@ -38,6 +38,7 @@ const MainScreen = ({ userData }) => {
   const [TypesToMap, setTypesToMap] = useState({});
   const [loading, setLoading] = useState(false);
   const [submitData, setSubmitData] = useState(null);
+  const [number, setNumber] = useState(1)
   const {getLocation, location}= useGeoLocation();
 
   // const [start, setStart] = useState('')
@@ -62,8 +63,12 @@ const MainScreen = ({ userData }) => {
   };
 
   const setGeoLocation = (location) => {
-      console.log(location, "location set geolocation")
-      if (location?.coordinates){return location?.coordinates?.lat + `,` + location?.coordinates?.lng }
+    setNumber(number + 1);
+      console.log(number, ' Number');
+    if (location?.coordinates)
+    {
+      return location?.coordinates?.lat + `,` + location?.coordinates?.lng
+    }
       else {return ""}
     
   };
@@ -193,7 +198,7 @@ const MainScreen = ({ userData }) => {
        onAddSerial(submitData?.rfId);
     }
 
-  },[location]);
+  },[location, number]);
 
   React.useEffect(() => {
     axios.get(`grnserial-conversion/?company=${52}`).then((e) => {
