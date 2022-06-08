@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
 
+
 const useGeoLocation = () => {
     const [location, setLocation] = useState(null);
+    const [refresh, setRefresh] = useState(0);
 
     const onSuccess = (location) => {
         setLocation({
@@ -24,6 +26,7 @@ const useGeoLocation = () => {
     };
 
     const getLocation = async () => {  
+        setRefresh(prev => prev + 1);
         let temLocation;
         if (!("geolocation" in navigator)) {
             onError({error: {
@@ -41,7 +44,7 @@ const useGeoLocation = () => {
         console.log(temLocation,"tempppppppppppp");
     }
 
-   return { getLocation, location}
+   return { getLocation, location, refresh}
         
 };
 

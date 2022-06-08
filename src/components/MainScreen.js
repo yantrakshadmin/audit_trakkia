@@ -15,7 +15,6 @@ import {
 } from 'antd';
 import axios from 'axios';
 import moment from 'moment';
-// import useGeoLocation from "hooks/useGeoLocation";
 import useGeoLocation from './useGeoLocation';
 
 const { Option } = Select;
@@ -38,17 +37,13 @@ const MainScreen = ({ userData }) => {
   const [TypesToMap, setTypesToMap] = useState({});
   const [loading, setLoading] = useState(false);
   const [submitData, setSubmitData] = useState(null);
-  const [number, setNumber] = useState(1)
-  const {getLocation, location}= useGeoLocation();
+  const {getLocation, location, refresh}= useGeoLocation();
 
-  // const [start, setStart] = useState('')
-  // console.log(decodeValues, 'decodeValues');
+
 
   const [form] = Form.useForm();
   // let checkObj = Object.values(decodeValues).map(e => e[0]);
   // let uniqueChars = [...new Set(checkObj)];
-
-  console.log(TypesToMap, 'TypesToMap');
 
   const getItemsLength = (decodeValues, type) => {
     let len = 0;
@@ -63,13 +58,14 @@ const MainScreen = ({ userData }) => {
   };
 
   const setGeoLocation = (location) => {
-    setNumber(number + 1);
-      console.log(number, ' Number');
+   
     if (location?.coordinates)
     {
       return location?.coordinates?.lat + `,` + location?.coordinates?.lng
     }
-      else {return ""}
+    else {
+      return ""
+    }
     
   };
 
@@ -194,11 +190,11 @@ const MainScreen = ({ userData }) => {
   };
 
   React.useEffect(() => {
-    if (submitData) {
+    if (submitData && refresh > 0) {
        onAddSerial(submitData?.rfId);
     }
 
-  },[location, number]);
+  },[ refresh]);
 
   React.useEffect(() => {
     axios.get(`grnserial-conversion/?company=${52}`).then((e) => {
@@ -232,7 +228,7 @@ const MainScreen = ({ userData }) => {
                 }
               }}
             >
-              <Form.Item name="warehouse" label="Select Warehouse">
+              <Form.Item name="warehouse" label="Select Warehouse :">
                 <Select
                   placeholder="Select Warehouse"
                   onChange={handleWarehouseChange}
@@ -287,7 +283,7 @@ const MainScreen = ({ userData }) => {
                     {(
                       (assetType[key] / getItemsLength(decodeValues, key)) *
                       100
-                    ).toFixed(1)}
+                    ).toFixed(1)} %
                   </Col>
 
                   {/* <Col span={8}>
