@@ -38,11 +38,14 @@ const MainScreen = ({ userData }) => {
   const [assetType, setAssetType] = useState({});
   const [addedSerials, setAddedSerials] = useState({});
   const [TypesToMap, setTypesToMap] = useState({});
+  const [scannedPillar, setScannedPillar] = useState({});
+  
+
   const [loading, setLoading] = useState(false);
   const [submitData, setSubmitData] = useState(null);
   const {getLocation, location, refresh}= useGeoLocation();
 
-  // console.log(decodeValues, 'decodeValues');
+  console.log(scannedPillar, 'scan1');
 
   const epc = ["kpmz9", "4oq2z",   "k15vj","a2xug",
 "l0umn",
@@ -51,6 +54,7 @@ const MainScreen = ({ userData }) => {
 "p32l6",
 "361mz",
 "sr6kg"]
+
   const [form] = Form.useForm();
   // let checkObj = Object.values(decodeValues).map(e => e[0]);
   // let uniqueChars = [...new Set(checkObj)];
@@ -82,7 +86,7 @@ const MainScreen = ({ userData }) => {
   const forceRerender = () => {
     setForceRerenderKey(Math.random());
   };
-
+console.log(scannedPillar, "scanned pillar")
   const reset = () => {
     setSubmitData(null)
     setSerials([]);
@@ -117,8 +121,12 @@ const MainScreen = ({ userData }) => {
   }, [selectedWarehouse]);
 
   const onAddSerial = (value) => {
-    console.log(location, "on add location")
+    
     const currentDecodeArr = decodeValues[value];
+    console.log(location, "on add location", currentDecodeArr &&
+    !addedSerials[value] &&
+    !addedItems[currentDecodeArr[0]], epc?.includes(value)
+    )
     form.setFieldsValue({ rfId: '' });
     if (
       currentDecodeArr &&
@@ -146,9 +154,14 @@ const MainScreen = ({ userData }) => {
           ? prev[currentDecodeArr[1]] + 1
           : 1,
       }));
-    setSubmitData(null);
     }
+    else if(epc?.includes(value)){
+        setScannedPillar( (prev)=>({...prev, [value]:true}));
+    }
+    setSubmitData(null);
+
     forceRerender();
+    
   };
 
   const deleteItem = (key, serial) => {
@@ -198,6 +211,20 @@ const MainScreen = ({ userData }) => {
       form.submit();
     }
   };
+
+
+
+  const getNumberOfPillars = (p) => {
+    let num = 0;
+       Object.keys(p||{}).map((key)=>{
+           if(p[key]){
+               num  = num + 1;
+           }
+       })    
+       return num
+   }
+
+//   console.log(getNumberOfScannedPillars, "number pil")
 
   React.useEffect(() => {
     if (submitData && refresh > 0) {
@@ -295,23 +322,29 @@ const MainScreen = ({ userData }) => {
                       />
                     )
                   )} */}
-                  {epc.includes('a2xug') ? (
-                    <img
-                      className="px-2"
-                      height={'40rem'}
-                      color="white"
-                      src={PillarGreen}
-                    />
-                  ) : (
-                    <img
-                      className="px-2"
-                      height={'40rem'}
-                      color="white"
-                      src={PillarRed}
-                    />
-                  )}
+
+                    <div style={{display:"flex", alignItems:"center", flexWrap:"wrap"}}>
+                    {(epc||[]).map((item)=>(<div>
+                        {scannedPillar[item]
+                        ? (
+                            <img
+                              className="p-1"
+                              height={'40rem'}
+                              color="white"
+                              src={PillarGreen}
+                            />
+                          ) : (
+                            <img
+                              className="p-1"
+                              height={'40rem'}
+                              color="white"
+                              src={PillarRed}
+                            />
+                          )}
+                    </div> ))}
+                    </div>
                 </Col>
-                <Col span={4}>{(1 / epc.length) * 100}%</Col>
+                <Col span={4}>{(getNumberOfPillars(scannedPillar)/ epc.length) * 100}%</Col>
               </Row>
             </div>
 
