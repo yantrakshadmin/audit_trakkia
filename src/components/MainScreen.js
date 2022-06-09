@@ -13,6 +13,9 @@ import {
   Input,
   message,
 } from 'antd';
+import PillarRed from "../img/PillarRed.jpeg";
+import PillarGreen from '../img/PillarGreen.jpeg';
+
 import axios from 'axios';
 import moment from 'moment';
 import useGeoLocation from './useGeoLocation';
@@ -39,8 +42,15 @@ const MainScreen = ({ userData }) => {
   const [submitData, setSubmitData] = useState(null);
   const {getLocation, location, refresh}= useGeoLocation();
 
+  // console.log(decodeValues, 'decodeValues');
 
-
+  const epc = ["kpmz9", "4oq2z",   "k15vj","a2xug",
+"l0umn",
+"wuj02",
+"e1r2f",
+"p32l6",
+"361mz",
+"sr6kg"]
   const [form] = Form.useForm();
   // let checkObj = Object.values(decodeValues).map(e => e[0]);
   // let uniqueChars = [...new Set(checkObj)];
@@ -221,10 +231,9 @@ const MainScreen = ({ userData }) => {
               layout="vertical"
               form={form}
               onFinish={(data) => {
-                
                 if (data.rfId) {
                   getLocation();
-               setSubmitData(data)
+                  setSubmitData(data);
                 }
               }}
             >
@@ -257,6 +266,56 @@ const MainScreen = ({ userData }) => {
               </Form.Item>
             </Form>
             <br />
+
+            <Row className="bg-light px-2 py-1">
+              <Col span={20}>
+                <b>Pillar</b>
+              </Col>
+              <Col span={4}>
+                <b>Percantage</b>
+              </Col>
+            </Row>
+            <div className="border" key={String($forceRerenderKey) + 'epc'}>
+              <Row className="px-2 py-2">
+                <Col span={20}>
+                  {/* {epc.map((e) =>
+                    e == 'a2xug' ? (
+                      <img
+                        className="px-2"
+                        height={'40rem'}
+                        color="white"
+                        src={PillarGreen}
+                      />
+                    ) : (
+                      <img
+                        className="px-2"
+                        height={'40rem'}
+                        color="white"
+                        src={PillarRed}
+                      />
+                    )
+                  )} */}
+                  {epc.includes('a2xug') ? (
+                    <img
+                      className="px-2"
+                      height={'40rem'}
+                      color="white"
+                      src={PillarGreen}
+                    />
+                  ) : (
+                    <img
+                      className="px-2"
+                      height={'40rem'}
+                      color="white"
+                      src={PillarRed}
+                    />
+                  )}
+                </Col>
+                <Col span={4}>{(1 / epc.length) * 100}%</Col>
+              </Row>
+            </div>
+
+            <br />
             {Object.keys(assetType).length > 0 && (
               <Row className="bg-light px-2 py-1">
                 <Col span={8}>
@@ -283,7 +342,12 @@ const MainScreen = ({ userData }) => {
                     {(
                       (assetType[key] / getItemsLength(decodeValues, key)) *
                       100
-                    ).toFixed(1)} %
+                    ).toFixed(1)}
+                    {console.log(
+                      getItemsLength(decodeValues, key),
+                      'assetType[key]'
+                    )}
+                    %
                   </Col>
 
                   {/* <Col span={8}>
