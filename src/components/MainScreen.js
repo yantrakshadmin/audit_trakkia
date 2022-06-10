@@ -173,7 +173,7 @@ const MainScreen = ({ userData }) => {
                                 onAddSerial(data.rfId)
                             }
                         }}>
-                            <Form.Item name="warehouse" label="Select Warehouse">
+                            <Form.Item name="warehouse" label="Select Warehouse ::">
                                 <Select
                                     placeholder="Select Warehouse"
                                     onChange={handleWarehouseChange}>
