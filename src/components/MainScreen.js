@@ -41,7 +41,7 @@ const MainScreen = ({ userData }) => {
   const {getLocation, location}= useGeoLocation();
 
   // const [start, setStart] = useState('')
-  // console.log(decodeValues, 'decodeValues');
+  console.log(serials, 'serials');
 
   const [form] = Form.useForm();
   // let checkObj = Object.values(decodeValues).map(e => e[0]);
@@ -121,13 +121,14 @@ const MainScreen = ({ userData }) => {
             ...prev,
             {
               serial: value,
-              start: moment().toISOString(),
+              time_stamp: moment().toISOString(),
               coordinate: setGeoLocation(location),
             },
           ],
           'serial'
         )
       );
+
       setAddedItems((prev) => ({ ...prev, [currentDecodeArr[0]]: true }));
       setAssetType((prev) => ({
         ...prev,
@@ -155,13 +156,14 @@ const MainScreen = ({ userData }) => {
   };
 
   const onSubmit = async () => {
+
     setLoading(true);
     axios
       .post(`/create-rfidinv/`, {
-        warehouse: selectedWarehouse?.id,
         serials,
-        start_time: serials[0].start,
-        end_time: serials[serials.length - 1].start,
+        warehouse: selectedWarehouse?.id,
+        start_time: serials[0].time_stamp,
+        end_time: serials[serials.length - 1].time_stamp,
       })
       .then((e) => {
         reset();
