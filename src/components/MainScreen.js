@@ -213,19 +213,18 @@ const MainScreen = ({ userData }) => {
   }, []);
 
   return (
-    <div className="site-card-border-less-wrapper">
+    <div className="">
       <br />
       <Row justify="center">
         <Col {...{ md: 12, sm: 24, lg: 12, xl: 12 }}>
-          <Card title="Audit" bordered={false}>
+          <Card style={{ borderRadius: '5px'}} title="Audit" bordered={false}>
             <Form
               layout="vertical"
               form={form}
               onFinish={(data) => {
-                
                 if (data.rfId) {
                   getLocation();
-               setSubmitData(data)
+                  setSubmitData(data);
                 }
               }}
             >

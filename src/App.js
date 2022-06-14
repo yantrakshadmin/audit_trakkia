@@ -4,9 +4,10 @@ import MainScreen from './components/MainScreen';
 import 'antd/dist/antd.css';
 import Header from './components/Header';
 import Login from './components/Login';
-import { Routes } from "react-router-dom";
 import { BrowserRouter } from "react-router-dom";
 import {initAxios} from './helpers/login'
+import { Footer } from 'antd/lib/layout/layout';
+
 
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
@@ -37,8 +38,9 @@ const App = () => {
                 setIsAuthenticated(true);
               }}
            /> }
-      <Routes>
-      </Routes>
+  
+        <Footer style={{ textAlign: 'center', marginTop: '2rem', backgroundColor: 'white' }}>Yantraksh Logistics Pvt. Ltd. © All rights reserved  (CO-T)</Footer>
+      
       </div>
     </BrowserRouter>
   );

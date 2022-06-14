@@ -25,7 +25,7 @@ function Header({ userData }) {
  
   return (
     <div className='header bg-white'>
-      <img src={Logo} alt='logo' />
+      <img className='py-1' src={Logo} alt='logo' />
       <div className='header-right'>
         <h3 className='username'>{userData?.username}</h3>
 

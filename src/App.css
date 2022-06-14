@@ -17,6 +17,9 @@
 .username {
   padding-right: 1rem;
 }
+.bgColorRed{
+  background-color: red;
+}
 
 /* LOGIN */
 .login-form {
