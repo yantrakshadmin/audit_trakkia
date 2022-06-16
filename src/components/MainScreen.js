@@ -19,8 +19,6 @@ import PillarGreen from '../img/PillarGreen.jpeg';
 import axios from 'axios';
 import moment from 'moment';
 
-
-
 const { Option } = Select;
 
 const statusValues = {
@@ -42,6 +40,9 @@ const MainScreen = ({ userData }) => {
   const [scannedPillar, setScannedPillar] = useState({});
 
   const [loading, setLoading] = useState(false);
+
+  console.log(serials, 'serials+++++++');
+
 
   const epc = [
     'kpmz9',
@@ -72,12 +73,10 @@ const MainScreen = ({ userData }) => {
     return len;
   };
 
-  
   const forceRerender = () => {
     setForceRerenderKey(Math.random());
   };
   const reset = () => {
-   
     setSerials([]);
     setAssetType({});
     setAddedItems({});
@@ -102,7 +101,6 @@ const MainScreen = ({ userData }) => {
     setAddedItems({});
     setAddedSerials({});
     setForceRerenderKey(Math.random());
-
   };
 
   React.useEffect(() => {
@@ -111,7 +109,9 @@ const MainScreen = ({ userData }) => {
 
   const onAddSerial = (value) => {
     const currentDecodeArr = decodeValues[value];
-    
+    console.log(decodeValues, 'onadd working');
+
+
     form.setFieldsValue({ rfId: '' });
     if (
       currentDecodeArr &&
@@ -141,10 +141,10 @@ const MainScreen = ({ userData }) => {
     } else if (epc?.includes(value)) {
       setScannedPillar((prev) => ({ ...prev, [value]: true }));
     }
-  
 
     forceRerender();
   };
+
 
   const deleteItem = (key, serial) => {
     const selectedDecodeValue = decodeValues[serial];
@@ -204,8 +204,6 @@ const MainScreen = ({ userData }) => {
     return num;
   };
 
-
-
   React.useEffect(() => {
     axios.get(`grnserial-conversion/?company=${52}`).then((e) => {
       let uniqueType = {};
@@ -232,8 +230,7 @@ const MainScreen = ({ userData }) => {
               form={form}
               onFinish={(data) => {
                 if (data.rfId) {
-               
-                  onAddSerial(data);
+                  onAddSerial(data.rfId);
                 }
               }}
             >
@@ -449,8 +446,6 @@ const MainScreen = ({ userData }) => {
               )}
             </div>
             <br />
-
-            
 
             <div className="">
               {status !== statusValues.start && (
