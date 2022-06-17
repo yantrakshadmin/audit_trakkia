@@ -16,6 +16,8 @@ import {
 import PillarRed from '../img/PillarRed.jpeg';
 import PillarGreen from '../img/PillarGreen.jpeg';
 
+
+
 import axios from 'axios';
 import moment from 'moment';
 
@@ -40,7 +42,7 @@ const MainScreen = ({ userData }) => {
   const [scannedPillar, setScannedPillar] = useState({});
   const [loading, setLoading] = useState(false);
 
-  console.log(serials, 'serials+++++++');
+  console.log(userData, 'userData+++++++');
 
   const rfidInputFocus = React.useRef(null);
 
@@ -207,15 +209,17 @@ const MainScreen = ({ userData }) => {
   };
 
   React.useEffect(() => {
-    axios.get(`grnserial-conversion/?company=${52}`).then((e) => {
-      let uniqueType = {};
-      Object.keys(e.data).map(
-        (key) => (uniqueType = { ...TypesToMap, [e.data[key][1]]: true }),
-        setTypesToMap(uniqueType)
-        // { setTypesToMap({ ...TypesToMap, [e.data[key][1]]: true }) }
-      );
-      setDecodeValues(e.data);
-    });
+    axios
+      .get(`grnserial-conversion/?company=${userData?.company_id}`)
+      .then((e) => {
+        let uniqueType = {};
+        Object.keys(e.data).map(
+          (key) => (uniqueType = { ...TypesToMap, [e.data[key][1]]: true }),
+          setTypesToMap(uniqueType)
+          // { setTypesToMap({ ...TypesToMap, [e.data[key][1]]: true }) }
+        );
+        setDecodeValues(e.data);
+      });
 
     document.addEventListener('keyup', handleKeyPress);
     return () => document.removeEventListener('keyup', handleKeyPress);
