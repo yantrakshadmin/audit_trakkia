@@ -38,11 +38,15 @@ const MainScreen = ({ userData }) => {
   const [addedSerials, setAddedSerials] = useState({});
   const [TypesToMap, setTypesToMap] = useState({});
   const [scannedPillar, setScannedPillar] = useState({});
-
   const [loading, setLoading] = useState(false);
 
   console.log(serials, 'serials+++++++');
 
+  const rfidInputFocus = React.useRef(null);
+
+  React.useEffect(() => {
+    rfidInputFocus.current.focus();
+  }, [warehouses, serials]);
 
   const epc = [
     'kpmz9',
@@ -111,7 +115,6 @@ const MainScreen = ({ userData }) => {
     const currentDecodeArr = decodeValues[value];
     console.log(decodeValues, 'onadd working');
 
-
     form.setFieldsValue({ rfId: '' });
     if (
       currentDecodeArr &&
@@ -144,7 +147,6 @@ const MainScreen = ({ userData }) => {
 
     forceRerender();
   };
-
 
   const deleteItem = (key, serial) => {
     const selectedDecodeValue = decodeValues[serial];
@@ -238,6 +240,7 @@ const MainScreen = ({ userData }) => {
                 <Select
                   placeholder="Select Warehouse"
                   onChange={handleWarehouseChange}
+                  autoFocus={true}
                 >
                   {(warehouses || []).map((v) => (
                     <Option value={v.id}>{v.name}</Option>
@@ -249,6 +252,7 @@ const MainScreen = ({ userData }) => {
                   disabled={!selectedWarehouse || status !== statusValues.start}
                   placeholder="Enter RFID"
                   maxLength={24}
+                  ref={rfidInputFocus}
                 />
               </Form.Item>
               <Form.Item>
