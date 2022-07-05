@@ -58,6 +58,10 @@
   overflow-y: scroll;
   max-height: 200px;
 }
+.pillar-scroll-view {
+  overflow-y: scroll;
+  max-height: 70px;
+}
 
 .serials-title {
   margin: 0;

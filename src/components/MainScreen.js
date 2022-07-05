@@ -12,6 +12,7 @@ import {
   Select,
   Input,
   message,
+  Popover
 } from 'antd';
 import PillarRed from '../img/PillarRed.jpeg';
 import PillarGreen from '../img/PillarGreen.jpeg';
@@ -20,6 +21,7 @@ import PillarGreen from '../img/PillarGreen.jpeg';
 
 import axios from 'axios';
 import moment from 'moment';
+import Item from 'antd/lib/list/Item';
 
 const { Option } = Select;
 
@@ -41,8 +43,9 @@ const MainScreen = ({ userData }) => {
   const [TypesToMap, setTypesToMap] = useState({});
   const [scannedPillar, setScannedPillar] = useState({});
   const [loading, setLoading] = useState(false);
+   const [visiblePop, setVisiblePop] = useState(false);
 
-  console.log(userData, 'userData+++++++');
+  console.log(scannedPillar, 'scannedPillar+++++++');
 
   const rfidInputFocus = React.useRef(null);
 
@@ -227,6 +230,7 @@ const MainScreen = ({ userData }) => {
 
   return (
     <div className="site-card-border-less-wrapper">
+
       <br />
       <Row justify="center">
         <Col {...{ md: 12, sm: 24, lg: 12, xl: 12 }}>
@@ -281,7 +285,7 @@ const MainScreen = ({ userData }) => {
               </Col>
             </Row>
             <div className="border" key={String($forceRerenderKey) + 'epc'}>
-              <Row className="px-2 py-2">
+              <Row className="pillar-scroll-view px-2 py-2">
                 <Col span={20}>
                   {/* {epc.map((e) =>
                     e == 'a2xug' ? (
@@ -310,13 +314,25 @@ const MainScreen = ({ userData }) => {
                   >
                     {(epc || []).map((item) => (
                       <div>
+                        {console.log(item, 'ep')}
+
                         {scannedPillar[item] ? (
-                          <img
-                            className="p-1"
-                            height={'40rem'}
-                            color="white"
-                            src={PillarGreen}
-                          />
+                          <Popover
+                            // content={<a onClick={hide}>Close</a>}
+                          content={item}
+                          
+                            trigger="click"
+                            visible={visiblePop}
+                            // onVisibleChange={handleVisibleChange}
+                          >
+                            <img
+                              onClick={() => setVisiblePop(true)}
+                              className="p-1"
+                              height={'40rem'}
+                              color="white"
+                              src={PillarGreen}
+                            />
+                          </Popover>
                         ) : (
                           <img
                             className="p-1"
@@ -329,7 +345,7 @@ const MainScreen = ({ userData }) => {
                     ))}
                   </div>
                 </Col>
-                <Col span={4}>
+                <Col style={{ paddingLeft: '1rem' }} span={4}>
                   {(getNumberOfPillars(scannedPillar) / epc.length) * 100}%
                 </Col>
               </Row>
