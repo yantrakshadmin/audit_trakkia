@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { DeleteOutlined } from '@ant-design/icons';
+import { DEFAULT_BASE_URL } from '../enviornment';
 import {
   List,
   Divider,
@@ -12,12 +13,10 @@ import {
   Select,
   Input,
   message,
-  Popover
+  Popover,
 } from 'antd';
 import PillarRed from '../img/PillarRed.jpeg';
 import PillarGreen from '../img/PillarGreen.jpeg';
-
-
 
 import axios from 'axios';
 import moment from 'moment';
@@ -43,11 +42,16 @@ const MainScreen = ({ userData }) => {
   const [TypesToMap, setTypesToMap] = useState({});
   const [scannedPillar, setScannedPillar] = useState({});
   const [loading, setLoading] = useState(false);
-   const [visiblePop, setVisiblePop] = useState(false);
-
-  console.log(scannedPillar, 'scannedPillar+++++++');
+  const [visiblePop, setVisiblePop] = useState(false);
+  const [userTags, setUserTags] = useState([]);
 
   const rfidInputFocus = React.useRef(null);
+
+  React.useEffect(() => {
+    axios.get(`/user-tags/`).then((e) => setUserTags(e.data));
+  }, []);
+  console.log(userTags, "userTags");
+  console.log(scannedPillar, 'scannedPillar');
 
   React.useEffect(() => {
     rfidInputFocus.current.focus();
@@ -117,10 +121,10 @@ const MainScreen = ({ userData }) => {
   }, [selectedWarehouse]);
 
   const onAddSerial = (value) => {
+    console.log(value,"text value");
     const currentDecodeArr = decodeValues[value];
-    console.log(decodeValues, 'onadd working');
-
     form.setFieldsValue({ rfId: '' });
+
     if (
       currentDecodeArr &&
       !addedSerials[value] &&
@@ -146,7 +150,8 @@ const MainScreen = ({ userData }) => {
           ? prev[currentDecodeArr[1]] + 1
           : 1,
       }));
-    } else if (epc?.includes(value)) {
+    }
+    else if (userTags?.includes(parseInt(value))) {
       setScannedPillar((prev) => ({ ...prev, [value]: true }));
     }
 
@@ -230,7 +235,6 @@ const MainScreen = ({ userData }) => {
 
   return (
     <div className="site-card-border-less-wrapper">
-
       <br />
       <Row justify="center">
         <Col {...{ md: 12, sm: 24, lg: 12, xl: 12 }}>
@@ -239,6 +243,7 @@ const MainScreen = ({ userData }) => {
               layout="vertical"
               form={form}
               onFinish={(data) => {
+                console.log (typeof data.rfId, "data rfidd");
                 if (data.rfId) {
                   onAddSerial(data.rfId);
                 }
@@ -312,15 +317,12 @@ const MainScreen = ({ userData }) => {
                       flexWrap: 'wrap',
                     }}
                   >
-                    {(epc || []).map((item) => (
+                    {(userTags || []).map((item) => (
                       <div>
-                        {console.log(item, 'ep')}
-
                         {scannedPillar[item] ? (
                           <Popover
                             // content={<a onClick={hide}>Close</a>}
-                          content={item}
-                          
+                            content={item}
                             trigger="click"
                             visible={visiblePop}
                             // onVisibleChange={handleVisibleChange}
