@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { DeleteOutlined } from '@ant-design/icons';
-import { DEFAULT_BASE_URL } from '../enviornment';
 import {
   List,
   Divider,
@@ -20,7 +19,6 @@ import PillarGreen from '../img/PillarGreen.jpeg';
 
 import axios from 'axios';
 import moment from 'moment';
-import Item from 'antd/lib/list/Item';
 
 const { Option } = Select;
 
@@ -71,8 +69,6 @@ const MainScreen = ({ userData }) => {
   ];
 
   const [form] = Form.useForm();
-  // let checkObj = Object.values(decodeValues).map(e => e[0]);
-  // let uniqueChars = [...new Set(checkObj)];
 
   const getItemsLength = (decodeValues, type) => {
     let len = 0;
@@ -82,6 +78,7 @@ const MainScreen = ({ userData }) => {
         len = len + 1;
         addedItems = { ...addedItems, [e[0]]: true };
       }
+      return null;
     });
     return len;
   };

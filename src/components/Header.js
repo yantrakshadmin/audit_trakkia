@@ -18,7 +18,7 @@ function Header({ userData }) {
 
   const init = async () => {
     const auth = await initAxios();
-    const { access, user } = auth;
+    const { access } = auth;
     setisAccess(access);
   }
 
