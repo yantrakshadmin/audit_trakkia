@@ -43,36 +43,17 @@ const MainScreen = ({ userData }) => {
   const [scannedPillar, setScannedPillar] = useState({});
   const [loading, setLoading] = useState(false);
   const [visiblePop, setVisiblePop] = useState(false);
-  const [userTags, setUserTags] = useState([]);
+
+  const [pillarsData, setPillarsData] = useState({});
+  const [scannedPillarPercentage, setScannedPillarPercentage] = useState(0);
 
   const rfidInputFocus = React.useRef(null);
-
-  React.useEffect(() => {
-    axios.get(`/user-tags/`).then((e) => setUserTags(e.data));
-  }, []);
-  console.log(userTags, "userTags");
-  console.log(scannedPillar, 'scannedPillar');
 
   React.useEffect(() => {
     rfidInputFocus.current.focus();
   }, [warehouses, serials]);
 
-  const epc = [
-    'kpmz9',
-    '4oq2z',
-    'k15vj',
-    'a2xug',
-    'l0umn',
-    'wuj02',
-    'e1r2f',
-    'p32l6',
-    '361mz',
-    'sr6kg',
-  ];
-
   const [form] = Form.useForm();
-  // let checkObj = Object.values(decodeValues).map(e => e[0]);
-  // let uniqueChars = [...new Set(checkObj)];
 
   const getItemsLength = (decodeValues, type) => {
     let len = 0;
@@ -97,7 +78,8 @@ const MainScreen = ({ userData }) => {
     setSelectedWarehouse(null);
     setStatus(statusValues.stop);
     setForceRerenderKey(Math.random());
-    form.setFieldsValue({ rfId: '', warehouse: null });
+    setScannedPillar({});
+    form.setFieldsValue({ rfId: '', warehouse: null, pillarZone: null, });
   };
 
   const removeDuplicateItems = (arr, key) => {
@@ -106,23 +88,35 @@ const MainScreen = ({ userData }) => {
   };
 
   const handleWarehouseChange = (e) => {
+    form.setFieldsValue({ rfId: '', pillarZone: null });
     const index = (warehouses || []).findIndex((item) => item.id === e);
     setSelectedWarehouse(warehouses[index]);
     setStatus(statusValues.start);
     setSerials([]);
+
+    setScannedPillar({});
     setAssetType({});
     setAddedItems({});
     setAddedSerials({});
     setForceRerenderKey(Math.random());
+    setScannedPillarPercentage(0);
   };
+
+  const handleAssetsPillar = (value) => {
+    setScannedPillarPercentage(0);
+    setScannedPillar({});
+    // setPillarsData(value)
+  };
+
 
   React.useEffect(() => {
     handelWarehouse();
+    getAssetsPillar();
   }, [selectedWarehouse]);
 
-  const onAddSerial = (value) => {
-    console.log(value,"text value");
+  const onAddSerial = (value, pillarZone) => {
     const currentDecodeArr = decodeValues[value];
+    console.log(value, pillarZone, currentDecodeArr, 'text value');
     form.setFieldsValue({ rfId: '' });
 
     if (
@@ -150,8 +144,22 @@ const MainScreen = ({ userData }) => {
           ? prev[currentDecodeArr[1]] + 1
           : 1,
       }));
-    }
-    else if (userTags?.includes(parseInt(value))) {
+    } else if (pillarsData && pillarsData[pillarZone]?.includes(value)) {
+      const newScannedPillars = { ...scannedPillar, [value]: true };
+      setScannedPillarPercentage(
+        isNaN(
+          (getNumberOfPillars(newScannedPillars) /
+            (pillarsData[pillarZone] || []).length) *
+            100
+        )
+          ? 0
+          : (
+              (getNumberOfPillars(newScannedPillars) /
+                (pillarsData[pillarZone] || []).length) *
+              100
+            ).toFixed(1)
+      );
+      console.log(pillarsData, pillarZone, 'ifffff dataaaaa');
       setScannedPillar((prev) => ({ ...prev, [value]: true }));
     }
 
@@ -198,6 +206,11 @@ const MainScreen = ({ userData }) => {
       .then((e) => setWarehouses(e.data))
       .catch((e) => {});
   };
+  const getAssetsPillar = async () => {
+    axios
+      .get(`/warehouse-pillarTags/?warehouse=${selectedWarehouse?.id}`)
+      .then((e) => setPillarsData(e.data));
+  };
 
   const handleKeyPress = (e) => {
     console.log(e.code, 'this/.....');
@@ -224,7 +237,6 @@ const MainScreen = ({ userData }) => {
         Object.keys(e.data).map(
           (key) => (uniqueType = { ...TypesToMap, [e.data[key][1]]: true }),
           setTypesToMap(uniqueType)
-          // { setTypesToMap({ ...TypesToMap, [e.data[key][1]]: true }) }
         );
         setDecodeValues(e.data);
       });
@@ -243,9 +255,9 @@ const MainScreen = ({ userData }) => {
               layout="vertical"
               form={form}
               onFinish={(data) => {
-                console.log (typeof data.rfId, "data rfidd");
+                console.log(typeof data.rfId, 'data rfidd');
                 if (data.rfId) {
-                  onAddSerial(data.rfId);
+                  onAddSerial(data.rfId, data.pillarZone);
                 }
               }}
             >
@@ -256,7 +268,24 @@ const MainScreen = ({ userData }) => {
                   autoFocus={true}
                 >
                   {(warehouses || []).map((v) => (
-                    <Option value={v.id}>{v.name}</Option>
+                    <Option key={v.id} value={v.id}>
+                      {v.name}
+                    </Option>
+                  ))}
+                </Select>
+              </Form.Item>
+
+              <Form.Item name="pillarZone" label="Zone Pillar :">
+                <Select
+                  autoFocus={true}
+                  disabled={!selectedWarehouse || status !== statusValues.start}
+                  placeholder="Set Pillar Zone"
+                  onChange={handleAssetsPillar}
+                >
+                  {(Object.entries(pillarsData) || []).map((v, i) => (
+                    <Option key={v[0]} value={v[0]}>
+                      {v[0]}
+                    </Option>
                   ))}
                 </Select>
               </Form.Item>
@@ -281,18 +310,22 @@ const MainScreen = ({ userData }) => {
             </Form>
             <br />
 
-            <Row className="bg-light px-2 py-1">
-              <Col span={20}>
-                <b>Pillar</b>
-              </Col>
-              <Col span={4}>
-                <b>Percantage</b>
-              </Col>
-            </Row>
-            <div className="border" key={String($forceRerenderKey) + 'epc'}>
-              <Row className="pillar-scroll-view px-2 py-2">
-                <Col span={20}>
-                  {/* {epc.map((e) =>
+            {(pillarsData[form.getFieldValue('pillarZone')] || []).length >
+              0 && (
+              <>
+                <Row className="bg-light px-2 py-1">
+                  <Col span={20}>
+                    <b>Pillar</b>
+                  </Col>
+                  <Col span={4}>
+                    <b>Percantage</b>
+                  </Col>
+                </Row>
+
+                <div className="border" key={String($forceRerenderKey) + 'epc'}>
+                  <Row className="pillar-scroll-view px-2 py-2">
+                    <Col span={20}>
+                      {/* {epc.map((e) =>
                     e == 'a2xug' ? (
                       <img
                         className="px-2"
@@ -310,50 +343,54 @@ const MainScreen = ({ userData }) => {
                     )
                   )} */}
 
-                  <div
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      flexWrap: 'wrap',
-                    }}
-                  >
-                    {(userTags || []).map((item) => (
-                      <div>
-                        {scannedPillar[item] ? (
-                          <Popover
-                            // content={<a onClick={hide}>Close</a>}
-                            content={item}
-                            trigger="click"
-                            visible={visiblePop}
-                            // onVisibleChange={handleVisibleChange}
-                          >
-                            <img
-                              onClick={() => setVisiblePop(true)}
-                              className="p-1"
-                              height={'40rem'}
-                              color="white"
-                              src={PillarGreen}
-                            />
-                          </Popover>
-                        ) : (
-                          <img
-                            className="p-1"
-                            height={'40rem'}
-                            color="white"
-                            src={PillarRed}
-                          />
-                        )}
+                      <div
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          flexWrap: 'wrap',
+                        }}
+                      >
+                        {(
+                          pillarsData[form.getFieldValue('pillarZone')] || []
+                        ).map((item) => (
+                          <div>
+                            {scannedPillar[item] ? (
+                              <Popover
+                                // content={<a onClick={hide}>Close</a>}
+                                content={item}
+                                trigger="click"
+                                visible={visiblePop}
+                                // onVisibleChange={handleVisibleChange}
+                              >
+                                <img
+                                  onClick={() => setVisiblePop(true)}
+                                  className="p-1"
+                                  height={'40rem'}
+                                  color="white"
+                                  src={PillarGreen}
+                                />
+                              </Popover>
+                            ) : (
+                              <img
+                                className="p-1"
+                                height={'40rem'}
+                                color="white"
+                                src={PillarRed}
+                              />
+                            )}
+                          </div>
+                        ))}
                       </div>
-                    ))}
-                  </div>
-                </Col>
-                <Col style={{ paddingLeft: '1rem' }} span={4}>
-                  {(getNumberOfPillars(scannedPillar) / epc.length) * 100}%
-                </Col>
-              </Row>
-            </div>
+                    </Col>
+                    <Col style={{ paddingLeft: '1rem' }} span={4}>
+                      {scannedPillarPercentage}%
+                    </Col>
+                  </Row>
+                </div>
+                <br />
+              </>
+            )}
 
-            <br />
             {Object.keys(assetType).length > 0 && (
               <Row className="bg-light px-2 py-1">
                 <Col span={8}>
@@ -504,10 +541,16 @@ const MainScreen = ({ userData }) => {
               >
                 Reset
               </Button>
+              {console.log(scannedPillarPercentage, 'scannedPillarPercentage')}
               <Button
+                key={'submit' + String(scannedPillarPercentage)}
                 loading={loading}
                 className="ml-2"
-                disabled={status !== statusValues.start || loading}
+                disabled={
+                  status !== statusValues.start ||
+                  loading ||
+                  parseInt(scannedPillarPercentage) !== 100
+                }
                 onClick={onSubmit}
               >
                 Submit
