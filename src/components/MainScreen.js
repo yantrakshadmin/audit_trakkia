@@ -46,10 +46,11 @@ const MainScreen = ({ userData }) => {
   const [scannedPillarPercentage, setScannedPillarPercentage] = useState(0);
 
   const rfidInputFocus = React.useRef(null);
+  console.log(scannedPillar, 'scannedPillar');
 
   React.useEffect(() => {
     rfidInputFocus.current.focus();
-  }, [warehouses, serials]);
+  }, [warehouses, serials, scannedPillar]);
 
   const [form] = Form.useForm();
 
@@ -158,7 +159,7 @@ const MainScreen = ({ userData }) => {
               100
             ).toFixed(1)
       );
-      console.log(pillarsData, pillarZone, 'ifffff dataaaaa');
+
       setScannedPillar((prev) => ({ ...prev, [value]: true }));
     }
 
@@ -351,10 +352,11 @@ const MainScreen = ({ userData }) => {
                       >
                         {(
                           pillarsData[form.getFieldValue('pillarZone')] || []
-                        ).map((item) => (
+                        ).map((item, i) => (
                           <div>
-                            {scannedPillar[item] ? (
+                            {scannedPillar[item] ?  (
                               <Popover
+                                key={i}
                                 // content={<a onClick={hide}>Close</a>}
                                 content={item}
                                 trigger="click"
@@ -370,12 +372,21 @@ const MainScreen = ({ userData }) => {
                                 />
                               </Popover>
                             ) : (
-                              <img
-                                className="p-1"
-                                height={'40rem'}
-                                color="white"
-                                src={PillarRed}
-                              />
+                                <Popover
+                                  key={i}
+                                // content={<a onClick={hide}>Close</a>}
+                                content={item}
+                                trigger="click"
+                                visible={visiblePop}
+                                // onVisibleChange={handleVisibleChange}
+                              >
+                                <img
+                                  className="p-1"
+                                  height={'40rem'}
+                                  color="white"
+                                  src={PillarRed}
+                                />
+                              </Popover>
                             )}
                           </div>
                         ))}
