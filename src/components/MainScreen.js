@@ -356,11 +356,11 @@ const MainScreen = ({ userData }) => {
                           <div>
                             {scannedPillar[item] ?  (
                               <Popover
-                                key={i}
+                                key={ ('popover'+ i)}
                                 // content={<a onClick={hide}>Close</a>}
                                 content={item}
                                 trigger="click"
-                                visible={visiblePop}
+                                // visible={visiblePop}
                                 // onVisibleChange={handleVisibleChange}
                               >
                                 <img
@@ -373,11 +373,11 @@ const MainScreen = ({ userData }) => {
                               </Popover>
                             ) : (
                                 <Popover
-                                  key={i}
+                                  key={ 'popover' + i}
                                 // content={<a onClick={hide}>Close</a>}
                                 content={item}
                                 trigger="click"
-                                visible={visiblePop}
+                                // visible={visiblePop}
                                 // onVisibleChange={handleVisibleChange}
                               >
                                 <img
